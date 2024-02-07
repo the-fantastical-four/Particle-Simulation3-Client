@@ -51,7 +51,7 @@ struct Particle {
 
         // Set velocity based on speed and angle
         velocity.x = speed * std::cos(angleRadians);
-        velocity.y = speed * std::sin(angleRadians);
+        velocity.y = -speed * std::sin(angleRadians);
     }
 };
 
