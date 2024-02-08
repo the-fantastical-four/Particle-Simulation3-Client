@@ -9,7 +9,7 @@ using namespace std;
 
 #define WIDTH 1280
 #define HEIGHT 720
-#define SIZE 8
+#define SIZE 4
 
 sf::Clock frameClock;
 
@@ -22,10 +22,10 @@ struct Wall {
 
     Wall(float x1, float y1, float x2, float y2) : x1(x1), y1(y1), x2(x2), y2(y2), shape(sf::Lines, 2) {
         // Set the position of the first point
-        shape[0].position = sf::Vector2f(x1, y1);
+        shape[0].position = sf::Vector2f(x1, HEIGHT - y1);
 
         // Set the position of the second point
-        shape[1].position = sf::Vector2f(x2, y2);
+        shape[1].position = sf::Vector2f(x2, HEIGHT - y2);
 
         shape[0].color = sf::Color::Yellow;
         shape[1].color = sf::Color::Yellow;
@@ -41,7 +41,9 @@ struct Particle {
         this->speed = speed; 
         shape.setSize(sf::Vector2f(SIZE, SIZE));
         shape.setFillColor(sf::Color::Cyan);
-        shape.setPosition(x, y);
+        // adjusting y relative to the size of the particle 
+        float adjusted_y = (HEIGHT - SIZE - y <= 0) ? HEIGHT - y : HEIGHT - SIZE - y; 
+        shape.setPosition(x, adjusted_y);
         set_angle_velocity(angle);
     }
 
@@ -51,7 +53,7 @@ struct Particle {
 
         // Set velocity based on speed and angle
         velocity.x = speed * std::cos(angleRadians);
-        velocity.y = -speed * std::sin(angleRadians);
+        velocity.y = speed * -std::sin(angleRadians);
     }
 };
 
@@ -59,20 +61,23 @@ struct Particle {
     This function handles the bouncing of particles on the screen
     edges and walls. 
 */
-void handleCollision(Particle& particle, const sf::Vector2u& windowSize, bool is_collide) {
+void handleCollision(Particle& particle, const sf::Vector2u& windowSize, bool is_collide, float delta) {
     sf::FloatRect bounds = particle.shape.getGlobalBounds();
 
     // Check collisions with window boundaries
-    if (bounds.left < 0 || bounds.left + bounds.width > windowSize.x) {
+    if (bounds.left <= 0 || bounds.left + bounds.width >= WIDTH) {
         particle.velocity.x = -particle.velocity.x;
+        particle.shape.move(particle.velocity * delta); 
     }
 
-    if (bounds.top < 0 || bounds.top + bounds.height > windowSize.y) {
+    if (bounds.top <= 0 || bounds.top + bounds.height >= HEIGHT) {
         particle.velocity.y = -particle.velocity.y;
+        particle.shape.move(particle.velocity * delta);
     }
 
     if (is_collide) {
         particle.velocity = -particle.velocity;
+        particle.shape.move(particle.velocity * delta); 
     }
 }
 
@@ -104,7 +109,7 @@ sf::Vector2f get_relative_pos(Particle particle) {
 */
 sf::Vector2f get_offset(Particle particle, Wall wall, float delta) {
 
-    sf::Vector2f position = get_relative_pos(particle);  
+    sf::Vector2f position = particle.shape.getPosition();  
     sf::Vector2f projection = position + particle.velocity * delta; 
     sf::Vector2f p0 = wall.shape[0].position; 
     sf::Vector2f p1 = wall.shape[1].position; 
@@ -146,13 +151,14 @@ void updateParticles(std::vector<Particle>& particles, const std::vector<Wall>& 
             sf::Vector2f temp = get_offset(particle, wall, delta); 
             if (temp != offset) {
                 offset = temp; 
-                collide_wall = true; 
+                //collide_wall = true; 
                 break; 
             }
         }
         
+
         particle.shape.move(offset);
-        handleCollision(particle, { WIDTH, HEIGHT }, collide_wall);
+        handleCollision(particle, { WIDTH, HEIGHT }, collide_wall, delta);
     }
 }
 
@@ -216,6 +222,8 @@ int main() {
                 particle_speed, particle_angle); 
             particles.push_back(particle); 
         }
+
+        ImGui::NewLine(); 
 
         // Input Wall 
         ImGui::Text("Spawn Wall"); 
