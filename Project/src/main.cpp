@@ -179,6 +179,11 @@ void updateParticles(std::vector<Particle>& particles, const std::vector<Wall>& 
     }
 }
 
+void show_frame_rate() {
+	ImGui::Begin("Frame Rate");
+	ImGui::Text("Frame Rate: %.2f", 1.0f / frameClock.restart().asSeconds());
+	ImGui::End();
+}
 int main() {
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Particle Bouncing");
     ImGui::SFML::Init(window);
@@ -253,6 +258,7 @@ int main() {
 
         switch (currentMenu) {
         case MENU:
+            show_frame_rate();
             ImGui::Begin("Case 1 Menu");
             ImGui::Text("Case 1");
 
