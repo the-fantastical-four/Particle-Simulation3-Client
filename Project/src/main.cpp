@@ -5,6 +5,7 @@
 #include <cmath>
 #include <random>
 #include <iostream>
+
 using namespace std;
 
 #define WIDTH 1280
@@ -12,9 +13,7 @@ using namespace std;
 #define SIZE 4
 
 enum MenuState {
-    SPAWN_CASE1_MENU,
-    SPAWN_CASE2_MENU,
-    SPAWN_CASE3_MENU
+    MENU    
 };
 
 sf::Clock frameClock;
@@ -196,24 +195,47 @@ int main() {
     float wall_x2 = 0.f;
     float wall_y2 = 0.f;
 
-    int batch_size = 0;
+    int batch_size_c = 0;
     // Batch spawning variables
-    float batch_start_x = 100;//0.f;
-    float batch_start_y = 100;//0.f;
-    float batch_end_x = 500;//0.f;
-    float batch_end_y = 400;//0.f;
-    float batch_start_angle = 55;//0.f;
-    float batch_end_angle = 0.f;
-    float batch_start_speed = 65;//0.f;
-    float batch_start_velocity = 0;//0.f;
-    float batch_end_velocity = 1000;//0.f;
+    float batch_start_x_c = 100;//0.f;
+    float batch_start_y_c = 100;//0.f;
+    float batch_end_x_c = 500;//0.f;
+    float batch_end_y_c = 400;//0.f;
+    float batch_start_angle_c = 55;//0.f;
+    float batch_end_angle_c = 0.f;
+    float batch_start_speed_c = 65;//0.f;
+    float batch_start_velocity_c = 0;//0.f;
+    float batch_end_velocity_c = 1000;//0.f;
 
+    int batch_size_b = 0;
+    // Batch spawning variables
+    float batch_start_x_b = 100;//0.f;
+    float batch_start_y_b = 100;//0.f;
+    float batch_end_x_b = 500;//0.f;
+    float batch_end_y_b = 400;//0.f;
+    float batch_start_angle_b = 55;//0.f;
+    float batch_end_angle_b = 0.f;
+    float batch_start_speed_b = 65;//0.f;
+    float batch_start_velocity_b = 0;//0.f;
+    float batch_end_velocity_b = 1000;//0.f;
+
+    int batch_size_a = 0;
+    // Batch spawning variables
+    float batch_start_x_a = 100;//0.f;
+    float batch_start_y_a = 100;//0.f;
+    float batch_end_x_a = 500;//0.f;
+    float batch_end_y_a = 400;//0.f;
+    float batch_start_angle_a = 55;//0.f;
+    float batch_end_angle_a = 0.f;
+    float batch_start_speed_a = 65;//0.f;
+    float batch_start_velocity_a = 0;//0.f;
+    float batch_end_velocity_a = 1000;//0.f;
     std::vector<Particle> particles;
     std::vector<Wall> walls;
 
     sf::Clock deltaClock;
 
-    MenuState currentMenu = SPAWN_CASE1_MENU; // Added boolean to switch between menus
+    MenuState currentMenu = MENU; // Added boolean to switch between menus
 
     // Game loop
     while (window.isOpen()) {
@@ -230,7 +252,7 @@ int main() {
         // -- BEGIN GUI STUFF --
 
         switch (currentMenu) {
-        case SPAWN_CASE1_MENU:
+        case MENU:
             ImGui::Begin("Case 1 Menu");
             ImGui::Text("Case 1");
 
@@ -283,239 +305,130 @@ int main() {
             // Input Particle
             ImGui::Text("Batch Spawn Particle");
             ImGui::Columns(2, "Spawn Batch Particle", false);
-            ImGui::InputInt("Batch Size", &batch_size);
+            ImGui::InputInt("Batch Size ", &batch_size_a);
+            //ImGui::InputInt("Batch Size ", &batch_size_a, 0, 0, ImGuiInputTextFlags_CharsDecimal); // Specify ImGuiInputTextFlags_CharsDecimal flag
+
             ImGui::NextColumn();
-            ImGui::InputFloat("Start Velocity", &batch_start_speed);
+            ImGui::InputFloat("Start Velocity ", &batch_start_speed_a);
             ImGui::NextColumn();
-            ImGui::InputFloat("Start x", &batch_start_x);
+            ImGui::InputFloat("Start x ", &batch_start_x_a);
             ImGui::NextColumn();
-            ImGui::InputFloat("Start y", &batch_start_y);
+            ImGui::InputFloat("Start y ", &batch_start_y_a);
             ImGui::NextColumn();
 
-            ImGui::InputFloat("End x", &batch_end_x);
+            ImGui::InputFloat("End x ", &batch_end_x_a);
             ImGui::NextColumn();
-            ImGui::InputFloat("End y", &batch_end_y);
+            ImGui::InputFloat("End y ", &batch_end_y_a);
             ImGui::NextColumn();
-            ImGui::InputFloat("Start Angle", &batch_start_angle);
+            ImGui::InputFloat("Start Angle ", &batch_start_angle_a);
             ImGui::NextColumn();
             ImGui::Columns(1); // end table
 
             // Confirm Button for batch spawning
             if (ImGui::Button("Spawn Batch Particle")) {
                 // Calculate the distance between start and end points
-                float distance_x = batch_end_x - batch_start_x;
-                float distance_y = batch_end_y - batch_start_y;
+                float distance_x = batch_end_x_a - batch_start_x_a;
+                float distance_y = batch_end_y_a - batch_start_y_a;
                 float total_distance = sqrt(distance_x * distance_x + distance_y * distance_y);
 
+
                 // Calculate the step size for evenly distributing particles
-                float step_size = total_distance / (batch_size - 1);
+                float step_size = 1;
+                if (batch_size_a > 1) {
+                    step_size = total_distance / (batch_size_a - 1);
+                }
 
                 // Calculate the angle of the line
                 float line_angle = atan2(distance_y, distance_x);
 
                 // Spawn particles along the line
-                for (int i = 0; i < batch_size; ++i) {
-                    float spawn_x = batch_start_x + i * step_size; //* cos(line_angle);
-                    float spawn_y = batch_start_y + i * step_size; //* sin(line_angle);
+                for (int i = 0; i < batch_size_a; ++i) {
+                    float spawn_x = batch_start_x_a + i * step_size * cos(line_angle);
+                    float spawn_y = batch_start_y_a + i * step_size * sin(line_angle);
 
-                    Particle particle = Particle(spawn_x, spawn_y, batch_start_speed, batch_start_angle);
+                    Particle particle = Particle(spawn_x, spawn_y, batch_start_speed_a, batch_start_angle_a);
                     particles.push_back(particle);
                 }
             }
 
-            ImGui::Text("Switch to Case 2 Menu");
-            if (ImGui::Button("Switch")) {
-                currentMenu = SPAWN_CASE2_MENU;
-            }
-
-            ImGui::End();
-            break;
-
-        case SPAWN_CASE2_MENU:
-            ImGui::Begin("Case 2 Menu");
-            ImGui::Text("Case 2");
-
-            // Input Particle
-            ImGui::Columns(2, "Spawn Particle", false);
-
-            ImGui::InputFloat("x", &particle_x);
-            ImGui::NextColumn();
-            ImGui::InputFloat("y", &particle_y);
-
-            ImGui::NextColumn();
-
-            ImGui::InputFloat("Angle", &particle_angle);
-            ImGui::NextColumn();
-            ImGui::InputFloat("Velocity", &particle_speed);
-
-            ImGui::Columns(1); // end table
-
-            // Confirm Button for individual particle spawning
-            if (ImGui::Button("Spawn Particle")) {
-                Particle particle = Particle(particle_x, particle_y,
-                    particle_speed, particle_angle);
-                particles.push_back(particle);
-            }
-            ImGui::NewLine();
-            // Input Wall 
-            ImGui::Text("Spawn Wall");
-            ImGui::Columns(2, "Spawn Wall", false);
-
-            ImGui::InputFloat("x1", &wall_x1);
-            ImGui::NextColumn();
-            ImGui::InputFloat("y1", &wall_y1);
-
-            ImGui::NextColumn();
-
-            ImGui::InputFloat("x2", &wall_x2);
-            ImGui::NextColumn();
-            ImGui::InputFloat("y2", &wall_y2);
-
-            ImGui::Columns(1);
-
-            if (ImGui::Button("Spawn Wall")) {
-                Wall wall = Wall(wall_x1, wall_y1, wall_x2, wall_y2);
-                walls.push_back(wall);
-            }
-
-            ImGui::NewLine();
-
             //BATCH SPAWN CASE 2
             // Input Particle
-            ImGui::Text("Batch Spawn Particle");
-            ImGui::Columns(2, "Spawn Batch Particle", false);
+            ImGui::NewLine();
+            ImGui::Text("Case 2: Batch Spawn Particle");
+            ImGui::Columns(2, "Case 2: Spawn Batch Particle", false);
 
-            ImGui::InputInt("Batch Size", &batch_size);
+            ImGui::InputInt("Batch Size  ", &batch_size_b);
             ImGui::NextColumn();
-            ImGui::InputFloat("Start Velocity", &batch_start_speed);
+            ImGui::InputFloat("Start Velocity  ", &batch_start_speed_b);
             ImGui::NextColumn();
-            ImGui::InputFloat("Start x", &batch_start_x);
+            ImGui::InputFloat("Start x  ", &batch_start_x_b);
             ImGui::NextColumn();
-            ImGui::InputFloat("Start y", &batch_start_y);
+            ImGui::InputFloat("Start y  ", &batch_start_y_b);
             ImGui::NextColumn();
 
-            ImGui::InputFloat("Start Angle", &batch_start_angle);
+            ImGui::InputFloat("Start Angle  ", &batch_start_angle_b);
             ImGui::NextColumn();
-            ImGui::InputFloat("End Angle", &batch_end_angle);
+            ImGui::InputFloat("End Angle  ", &batch_end_angle_b);
 
             ImGui::Columns(1); // end table
 
             // Confirm Button for batch spawning
-            if (ImGui::Button("Spawn Batch Particle")) {
-                float angle_increment = (batch_end_angle - batch_start_angle) / (batch_size - 1);
-                float current_angle = batch_start_angle;
+            if (ImGui::Button("Spawn Batch Particle ")) {
+                float angle_increment = (batch_end_angle_b - batch_start_angle_b) / (batch_size_b - 1);
+                float current_angle = batch_start_angle_b;
                 int spawn_distance = 100;
 
-                for (int i = 0; i < batch_size; ++i) {
-                    float spawn_x = batch_start_x;
-                    float spawn_y = batch_start_y;
+                for (int i = 0; i < batch_size_b; ++i) {
+                    float spawn_x = batch_start_x_b;
+                    float spawn_y = batch_start_y_b;
 
-                    Particle particle = Particle(spawn_x, spawn_y, batch_start_speed, current_angle);
+                    Particle particle = Particle(spawn_x, spawn_y, batch_start_speed_b, current_angle);
                     particles.push_back(particle);
 
                     spawn_distance += 100;
                     current_angle += angle_increment;
                 }
             }
-
-            ImGui::Text("Switch to Case 3 Menu");
-            if (ImGui::Button("Switch")) {
-                currentMenu = SPAWN_CASE3_MENU;
-            }
-
-            ImGui::End();
-            break;
-
-        case SPAWN_CASE3_MENU:
-            ImGui::Begin("Case 3 Menu");
-            ImGui::Text("Case 3");
-
-            // Input Particle
-            ImGui::Columns(2, "Spawn Particle", false);
-
-            ImGui::InputFloat("x", &particle_x);
-            ImGui::NextColumn();
-            ImGui::InputFloat("y", &particle_y);
-
-            ImGui::NextColumn();
-
-            ImGui::InputFloat("Angle", &particle_angle);
-            ImGui::NextColumn();
-            ImGui::InputFloat("Velocity", &particle_speed);
-
-            ImGui::Columns(1); // end table
-
-            // Confirm Button for individual particle spawning
-            if (ImGui::Button("Spawn Particle")) {
-                Particle particle = Particle(particle_x, particle_y,
-                    particle_speed, particle_angle);
-                particles.push_back(particle);
-            }
+            
+            //Case 3
             ImGui::NewLine();
-            // Input Wall 
-            ImGui::Text("Spawn Wall");
-            ImGui::Columns(2, "Spawn Wall", false);
+            ImGui::Text("Case 3: Batch Spawn Particle");
+            ImGui::Columns(2, "Case 3: Spawn Batch Particle", false);
 
-            ImGui::InputFloat("x1", &wall_x1);
+            ImGui::InputInt("Batch Size", &batch_size_c);
             ImGui::NextColumn();
-            ImGui::InputFloat("y1", &wall_y1);
-
+            ImGui::InputFloat("Start Angle", &batch_start_angle_c);
             ImGui::NextColumn();
-
-            ImGui::InputFloat("x2", &wall_x2);
+            ImGui::InputFloat("Start x", &batch_start_x_c);
             ImGui::NextColumn();
-            ImGui::InputFloat("y2", &wall_y2);
-
-            ImGui::Columns(1);
-
-            if (ImGui::Button("Spawn Wall")) {
-                Wall wall = Wall(wall_x1, wall_y1, wall_x2, wall_y2);
-                walls.push_back(wall);
-            }
-
-            ImGui::NewLine();
-
-            //BATCH SPAWN CASE 2
-            // Input Particle
-            ImGui::Text("Batch Spawn Particle");
-            ImGui::Columns(2, "Spawn Batch Particle", false);
-
-            ImGui::InputInt("Batch Size", &batch_size);
-            ImGui::NextColumn();
-            ImGui::InputFloat("Start Angle", &batch_start_angle);
-            ImGui::NextColumn();
-            ImGui::InputFloat("Start x", &batch_start_x);
-            ImGui::NextColumn();
-            ImGui::InputFloat("Start y", &batch_start_y);
+            ImGui::InputFloat("Start y", &batch_start_y_c);
             ImGui::NextColumn();
 
-            ImGui::InputFloat("Start Velocity", &batch_start_velocity);
+            ImGui::InputFloat("Start Velocity", &batch_start_velocity_c);
             ImGui::NextColumn();
-            ImGui::InputFloat("End Velocity", &batch_end_velocity);
+            ImGui::InputFloat("End Velocity", &batch_end_velocity_c);
 
             ImGui::Columns(1); // end table
 
             // Confirm Button for batch spawning
-            if (ImGui::Button("Spawn Batch Particle")) {
+            if (ImGui::Button("Spawn Batch Particle   ")) {
                 // Calculate the velocity increment for each particle
-                float velocity_increment = (batch_end_velocity - batch_start_velocity) / (batch_size - 1);
-
-                for (int i = 0; i < batch_size; ++i) {
+                float velocity_increment = 1;
+                if (batch_size_c > 1) {
+                    velocity_increment = (batch_end_velocity_c - batch_start_velocity_c) / (batch_size_c - 1);
+                }
+                for (int i = 0; i < batch_size_c; ++i) {
                     // Interpolate velocity for the current particle
-                    float current_velocity = batch_start_velocity + i * velocity_increment;
+                    float current_velocity = batch_start_velocity_c + i * velocity_increment;
 
-                    Particle particle = Particle(batch_start_x, batch_start_y, current_velocity, batch_start_angle);
+                    Particle particle = Particle(batch_start_x_c, batch_start_y_c, current_velocity, batch_start_angle_c);
                     particles.push_back(particle);
                 }
             }
-
-            ImGui::Text("Switch to Case 1 Menu");
-            if (ImGui::Button("Switch")) {
-                currentMenu = SPAWN_CASE1_MENU;
-            }
-
+            
             ImGui::End();
             break;
+
         }
 
         // -- END GUI STUFF --
