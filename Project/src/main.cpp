@@ -33,11 +33,15 @@ struct Wall {
 };
 
 struct Particle {
+    float x;
+    float y; 
     float speed;
     sf::RectangleShape shape;
     sf::Vector2f velocity;
 
     Particle(float x, float y, float speed, float angle) {
+        this->x = x; // this is just to track starting position 
+        this->y = y; // this is just to track starting posiiton 
         this->speed = speed; 
         shape.setSize(sf::Vector2f(SIZE, SIZE));
         shape.setFillColor(sf::Color::Cyan);
@@ -65,14 +69,22 @@ void handleCollision(Particle& particle, const sf::Vector2u& windowSize, bool is
     sf::FloatRect bounds = particle.shape.getGlobalBounds();
 
     // Check collisions with window boundaries
-    if (bounds.left <= 0 || bounds.left + bounds.width >= WIDTH) {
+    if (bounds.left < 0 || bounds.left + bounds.width > WIDTH) {
         particle.velocity.x = -particle.velocity.x;
-        particle.shape.move(particle.velocity * delta); 
+        // this part is just to prevent the particle from riding the wall if it spawns on the wall
+        if (particle.x == 0) {
+            particle.shape.move(particle.velocity * delta);
+            particle.x++; 
+        } 
     }
 
-    if (bounds.top <= 0 || bounds.top + bounds.height >= HEIGHT) {
+    if (bounds.top < 0 || bounds.top + bounds.height > HEIGHT) {
         particle.velocity.y = -particle.velocity.y;
-        particle.shape.move(particle.velocity * delta);
+        // this part is just to prevent the particle from riding the wall if it spawns on the wall
+        if (particle.y == 0) {
+            particle.shape.move(particle.velocity * delta);
+            particle.y++; 
+        }
     }
 
     if (is_collide) {
@@ -151,7 +163,7 @@ void updateParticles(std::vector<Particle>& particles, const std::vector<Wall>& 
             sf::Vector2f temp = get_offset(particle, wall, delta); 
             if (temp != offset) {
                 offset = temp; 
-                //collide_wall = true; 
+                collide_wall = true; 
                 break; 
             }
         }
@@ -177,6 +189,16 @@ int main() {
     float wall_y1 = 0.f; 
     float wall_x2 = 0.f; 
     float wall_y2 = 0.f; 
+
+    int batch_size = 0; 
+    float start_x = 0.f; 
+    float start_y = 0.f; 
+    float end_x = 0.f; 
+    float end_y = 0.f; 
+    float start_angle = 0.f; 
+    float end_angle = 0.f; 
+    float start_speed = 0.f; 
+    float end_speed = 0.f; 
 
     std::vector<Particle> particles;
     std::vector<Wall> walls;
