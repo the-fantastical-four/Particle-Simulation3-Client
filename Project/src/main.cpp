@@ -11,6 +11,12 @@ using namespace std;
 #define HEIGHT 720
 #define SIZE 4
 
+enum MenuState {
+    SPAWN_CASE1_MENU,
+    SPAWN_CASE2_MENU,
+    SPAWN_CASE3_MENU
+};
+
 sf::Clock frameClock;
 
 struct Wall {
@@ -176,19 +182,19 @@ void updateParticles(std::vector<Particle>& particles, const std::vector<Wall>& 
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Particle Bouncing");
-    ImGui::SFML::Init(window); 
+    ImGui::SFML::Init(window);
     window.setFramerateLimit(60);
 
-    // to store input 
+    // to store input
     float particle_x = 0.f;
-    float particle_y = 0.f; 
-    float particle_angle = 0.f; 
-    float particle_speed = 0.f; 
+    float particle_y = 0.f;
+    float particle_angle = 0.f;
+    float particle_speed = 0.f;
 
-    float wall_x1 = 0.f; 
-    float wall_y1 = 0.f; 
-    float wall_x2 = 0.f; 
-    float wall_y2 = 0.f; 
+    float wall_x1 = 0.f;
+    float wall_y1 = 0.f;
+    float wall_x2 = 0.f;
+    float wall_y2 = 0.f;
 
     int batch_size = 0; 
     float start_x = 0.f; 
@@ -203,14 +209,15 @@ int main() {
     std::vector<Particle> particles;
     std::vector<Wall> walls;
 
-    sf::Clock deltaClock; 
+    sf::Clock deltaClock;
+
+    MenuState currentMenu = SPAWN_CASE1_MENU; // Added boolean to switch between menus
 
     // Game loop
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-
-            ImGui::SFML::ProcessEvent(event); 
+            ImGui::SFML::ProcessEvent(event);
 
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -218,62 +225,118 @@ int main() {
 
         ImGui::SFML::Update(window, deltaClock.restart());
 
-        // -- BEGIN GUI STUFF -- 
+        // -- BEGIN GUI STUFF --
 
-        ImGui::Begin("Menu");
-        ImGui::Text("Spawn Particle"); 
+        switch (currentMenu) {
+        case SPAWN_CASE1_MENU:
+            ImGui::Begin("Spawn Case 1 Menu");
+            ImGui::Text("Case 1");
 
-        // Input Particle 
-        ImGui::Columns(2, "Spawn Particle", false);
+            // Input Particle
+            ImGui::Columns(2, "Spawn Particle", false);
 
-        ImGui::InputFloat("x", &particle_x);
-        ImGui::NextColumn(); 
-        ImGui::InputFloat("y", &particle_y); 
+            ImGui::InputFloat("x", &particle_x);
+            ImGui::NextColumn();
+            ImGui::InputFloat("y", &particle_y);
 
-        ImGui::NextColumn();
+            ImGui::NextColumn();
 
-        ImGui::InputFloat("Angle", &particle_angle);
-        ImGui::NextColumn(); 
-        ImGui::InputFloat("Velocity", &particle_speed); 
+            ImGui::InputFloat("Angle", &particle_angle);
+            ImGui::NextColumn();
+            ImGui::InputFloat("Velocity", &particle_speed);
 
-        ImGui::Columns(1); // end table 
+            ImGui::Columns(1); // end table
 
-        // Confirm Button 
-        if (ImGui::Button("Spawn Particle")) {
-            Particle particle = Particle(particle_x, particle_y, 
-                particle_speed, particle_angle); 
-            particles.push_back(particle); 
+            // Confirm Button
+            if (ImGui::Button("Spawn Particle")) {
+                Particle particle = Particle(particle_x, particle_y,
+                    particle_speed, particle_angle);
+                particles.push_back(particle);
+            }
+
+            ImGui::NewLine();
+
+            // Input Wall 
+            ImGui::Text("Spawn Wall");
+            ImGui::Columns(2, "Spawn Wall", false);
+
+            ImGui::InputFloat("x1", &wall_x1);
+            ImGui::NextColumn();
+            ImGui::InputFloat("y1", &wall_y1);
+
+            ImGui::NextColumn();
+
+            ImGui::InputFloat("x2", &wall_x2);
+            ImGui::NextColumn();
+            ImGui::InputFloat("y2", &wall_y2);
+
+            ImGui::Columns(1);
+
+            if (ImGui::Button("Spawn Wall")) {
+                Wall wall = Wall(wall_x1, wall_y1, wall_x2, wall_y2);
+                walls.push_back(wall);
+            }
+
+            ImGui::Text("Switch to Case 2 Menu");
+            if (ImGui::Button("Switch")) {
+                currentMenu = SPAWN_CASE2_MENU;
+            }
+
+            ImGui::End();
+            break;
+
+        case SPAWN_CASE2_MENU:
+            ImGui::Begin("Spawn Case 2 Menu");
+            ImGui::Text("Case 2");
+
+            // Input Wall
+            ImGui::Columns(2, "Spawn Wall", false);
+
+            ImGui::InputFloat("x1", &wall_x1);
+            ImGui::NextColumn();
+            ImGui::InputFloat("y1", &wall_y1);
+
+            ImGui::NextColumn();
+
+            ImGui::InputFloat("x2", &wall_x2);
+            ImGui::NextColumn();
+            ImGui::InputFloat("y2", &wall_y2);
+
+            ImGui::Columns(1);
+
+            // Confirm Button
+            if (ImGui::Button("Spawn Wall")) {
+                Wall wall = Wall(wall_x1, wall_y1, wall_x2, wall_y2);
+                walls.push_back(wall);
+            }
+
+            ImGui::NewLine();
+
+            ImGui::Text("Switch to Case 3");
+            if (ImGui::Button("Switch")) {
+                currentMenu = SPAWN_CASE3_MENU;
+            }
+
+            ImGui::End();
+            break;
+
+        case SPAWN_CASE3_MENU:
+            ImGui::Begin("Spawn Case 3 Menu");
+            // Content for the other menu state
+            ImGui::Text("Case 3");
+            ImGui::Text("You can add your other controls here.");
+            ImGui::Text("Switch to Spawn Particle Menu");
+            if (ImGui::Button("Switch")) {
+                currentMenu = SPAWN_CASE1_MENU;
+            }
+            ImGui::End();
+            break;
         }
 
-        ImGui::NewLine(); 
-
-        // Input Wall 
-        ImGui::Text("Spawn Wall"); 
-        ImGui::Columns(2, "Spawn Wall", false); 
-
-        ImGui::InputFloat("x1", &wall_x1);
-        ImGui::NextColumn(); 
-        ImGui::InputFloat("y1", &wall_y1);
-
-        ImGui::NextColumn(); 
-
-        ImGui::InputFloat("x2", &wall_x2);
-        ImGui::NextColumn();
-        ImGui::InputFloat("y2", &wall_y2);
-
-        ImGui::Columns(1); 
-
-        if (ImGui::Button("Spawn Wall")) {
-            Wall wall = Wall(wall_x1, wall_y1, wall_x2, wall_y2); 
-            walls.push_back(wall); 
-        }
-
-        ImGui::End(); 
-
-        // -- END GUI STUFF -- 
+        // -- END GUI STUFF --
 
         // Update particle positions and handle collisions
-        updateParticles(particles, walls);
+        updateParticles(particles, walls); // assuming you have a function for this
 
         // Clear the window
         window.clear();
@@ -289,10 +352,11 @@ int main() {
         }
 
         // Display the contents of the window
-        ImGui::SFML::Render(window); 
+        ImGui::SFML::Render(window);
         window.display();
     }
 
-    ImGui::SFML::Shutdown(); 
+    ImGui::SFML::Shutdown();
     return 0;
 }
+
