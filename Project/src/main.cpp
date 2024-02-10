@@ -160,7 +160,7 @@ sf::Vector2f get_offset(Particle particle, Wall wall, float delta) {
     AKA this is what makes the particles move with collision. 
 */
 void updateParticles(std::vector<Particle>& particles, const std::vector<Wall>& walls) {
-    sf::Time elapsed_time = frameClock.restart();
+    sf::Time elapsed_time = frameClock.getElapsedTime();
     float delta = elapsed_time.asSeconds();
 
     for (auto& particle : particles) {
@@ -475,15 +475,20 @@ int main() {
             }
         }
 
+        if (ImGui::Button("Reset")) {
+            particles.clear();
+            walls.clear(); 
+        }
+
         ImGui::End();
 
         // -- END GUI STUFF --
 
         // Update particle positions and handle collisions
-        // updateParticles(particles, walls); 
+        updateParticles(particles, walls); // single threaded implementation
 
         // Update particle positions and handle collisions asynchronously in batches
-        updateParticlesAsyncBatch(particles, walls, 10000);  // Adjust batch size as needed
+        // updateParticlesAsyncBatch(particles, walls, 10000);  // Adjust batch size as needed
         frameClock.restart();
         // Clear the window
         window.clear();
