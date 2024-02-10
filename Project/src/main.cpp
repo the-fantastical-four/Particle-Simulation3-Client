@@ -5,6 +5,8 @@
 #include <cmath>
 #include <random>
 #include <iostream>
+#include <future>
+#include <thread>
 
 using namespace std;
 
@@ -78,8 +80,8 @@ void handleCollision(Particle& particle, const sf::Vector2u& windowSize, bool is
     if (bounds.left < 0 || bounds.left + bounds.width > WIDTH) {
         particle.velocity.x = -particle.velocity.x;
         // this part is just to prevent the particle from riding the wall if it spawns on the wall
+        particle.shape.move(particle.velocity * delta);
         if (particle.x == 0) {
-            particle.shape.move(particle.velocity * delta);
             particle.x++; 
         } 
     }
@@ -87,8 +89,8 @@ void handleCollision(Particle& particle, const sf::Vector2u& windowSize, bool is
     if (bounds.top < 0 || bounds.top + bounds.height > HEIGHT) {
         particle.velocity.y = -particle.velocity.y;
         // this part is just to prevent the particle from riding the wall if it spawns on the wall
+        particle.shape.move(particle.velocity * delta);
         if (particle.y == 0) {
-            particle.shape.move(particle.velocity * delta);
             particle.y++; 
         }
     }
@@ -179,6 +181,54 @@ void updateParticles(std::vector<Particle>& particles, const std::vector<Wall>& 
     }
 }
 
+void updateParticleBatch(std::vector<Particle>& particles, const std::vector<Wall>& walls, size_t startIdx, size_t endIdx) {
+    sf::Time elapsed_time = frameClock.getElapsedTime();
+    float delta = elapsed_time.asSeconds();
+
+    for (size_t i = startIdx; i < endIdx; i++) {
+        Particle& particle = particles[i];
+
+        sf::Vector2f offset = particle.velocity * delta;
+        bool collide_wall = false;
+
+        for (const auto& wall : walls) {
+            sf::Vector2f temp = get_offset(particle, wall, delta);
+            if (temp != offset) {
+                offset = temp;
+                collide_wall = true;
+                break;
+            }
+        }
+
+        particle.shape.move(offset);
+        handleCollision(particle, { WIDTH, HEIGHT }, collide_wall, delta);
+    }
+}
+
+void updateParticlesAsyncBatch(std::vector<Particle>& particles, const std::vector<Wall>& walls, size_t batchSize) {
+    sf::Time elapsed_time = frameClock.getElapsedTime();
+    float delta = elapsed_time.asSeconds();
+
+    // Calculate the number of batches
+    size_t numParticles = particles.size();
+    size_t numBatches = (numParticles + batchSize - 1) / batchSize;
+
+    std::vector<std::future<void>> futures;
+
+    for (size_t batchIdx = 0; batchIdx < numBatches; batchIdx++) {
+        size_t startIdx = batchIdx * batchSize;
+        size_t endIdx = std::min((batchIdx + 1) * batchSize, numParticles);
+
+        auto future = std::async(std::launch::async, updateParticleBatch, std::ref(particles), std::cref(walls), startIdx, endIdx);
+        futures.push_back(std::move(future));
+    }
+
+    // Wait for all asynchronous tasks to complete
+    for (auto& future : futures) {
+        future.get();
+    }
+}
+
 void show_frame_rate() {
 	ImGui::Begin("Frame Rate");
 	ImGui::Text("Frame Rate: %.2f", 1.0f / fpsClock.restart().asSeconds());
@@ -213,16 +263,16 @@ int main() {
     float batch_start_velocity_c = 0;//0.f;
     float batch_end_velocity_c = 1000;//0.f;
 
-    int batch_size_b = 0;
+    int batch_size_b = 1000;
     // Batch spawning case 2 variables
     float batch_start_x_b = 100;//0.f;
     float batch_start_y_b = 100;//0.f;
     float batch_end_x_b = 500;//0.f;
     float batch_end_y_b = 400;//0.f;
-    float batch_start_angle_b = 55;//0.f;
+    float batch_start_angle_b = 90.f;//0.f;
     float batch_end_angle_b = 0.f;
     float batch_start_speed_b = 65;//0.f;
-    float batch_start_velocity_b = 0;//0.f;
+    float batch_start_velocity_b = 1000;//0.f;
     float batch_end_velocity_b = 1000;//0.f;
 
     int batch_size_a = 0;
@@ -432,8 +482,11 @@ int main() {
         // -- END GUI STUFF --
 
         // Update particle positions and handle collisions
-        updateParticles(particles, walls); // assuming you have a function for this
+        // updateParticles(particles, walls); 
 
+        // Update particle positions and handle collisions asynchronously in batches
+        updateParticlesAsyncBatch(particles, walls, 10000);  // Adjust batch size as needed
+        frameClock.restart();
         // Clear the window
         window.clear();
 
