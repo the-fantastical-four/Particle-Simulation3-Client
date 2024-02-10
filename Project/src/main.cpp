@@ -7,7 +7,6 @@
 #include <iostream>
 #include <future>
 #include <thread>
-#include <pool.cpp>
 
 using namespace std;
 
@@ -207,8 +206,6 @@ void updateParticleBatch(std::vector<Particle>& particles, const std::vector<Wal
 }
 
 void updateParticlesAsyncBatch(std::vector<Particle>& particles, const std::vector<Wall>& walls, size_t batchSize) {
-    sf::Time elapsed_time = frameClock.getElapsedTime();
-    float delta = elapsed_time.asSeconds();
 
     // Calculate the number of batches
     size_t numParticles = particles.size();
@@ -291,8 +288,6 @@ int main() {
     std::vector<Wall> walls;
 
     sf::Clock deltaClock;
-
-    ThreadPool threadPool(4);
 
     // Game loop
     while (window.isOpen()) {
@@ -489,7 +484,6 @@ int main() {
 
         // Update particle positions and handle collisions asynchronously in batches
         updateParticlesAsyncBatch(particles, walls, 10000);  // Adjust batch size as needed
-
         frameClock.restart();
         // Clear the window
         window.clear();
