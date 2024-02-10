@@ -7,6 +7,7 @@
 #include <iostream>
 #include <future>
 #include <thread>
+#include <pool.cpp>
 
 using namespace std;
 
@@ -291,6 +292,8 @@ int main() {
 
     sf::Clock deltaClock;
 
+    ThreadPool threadPool(4);
+
     // Game loop
     while (window.isOpen()) {
         sf::Event event;
@@ -486,6 +489,7 @@ int main() {
 
         // Update particle positions and handle collisions asynchronously in batches
         updateParticlesAsyncBatch(particles, walls, 10000);  // Adjust batch size as needed
+
         frameClock.restart();
         // Clear the window
         window.clear();
