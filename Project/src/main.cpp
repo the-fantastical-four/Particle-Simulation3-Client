@@ -81,18 +81,12 @@ void handleCollision(Particle& particle, const sf::Vector2u& windowSize, bool is
         particle.velocity.x = -particle.velocity.x;
         // this part is just to prevent the particle from riding the wall if it spawns on the wall
         particle.shape.move(particle.velocity * delta);
-        if (particle.x == 0) {
-            particle.x++; 
-        } 
     }
 
     if (bounds.top < 0 || bounds.top + bounds.height > HEIGHT) {
         particle.velocity.y = -particle.velocity.y;
         // this part is just to prevent the particle from riding the wall if it spawns on the wall
         particle.shape.move(particle.velocity * delta);
-        if (particle.y == 0) {
-            particle.y++; 
-        }
     }
 
     if (is_collide) {
@@ -182,7 +176,7 @@ void updateParticles(std::vector<Particle>& particles, const std::vector<Wall>& 
 }
 
 void updateParticleBatch(std::vector<Particle>& particles, const std::vector<Wall>& walls, size_t startIdx, size_t endIdx) {
-    sf::Time elapsed_time = frameClock.getElapsedTime();
+    sf::Time elapsed_time = frameClock.getElapsedTime(); // frameClock.reset(); 
     float delta = elapsed_time.asSeconds();
 
     for (size_t i = startIdx; i < endIdx; i++) {
@@ -217,6 +211,25 @@ void updateParticlesAsyncBatch(std::vector<Particle>& particles, const std::vect
         size_t startIdx = batchIdx * batchSize;
         size_t endIdx = std::min((batchIdx + 1) * batchSize, numParticles);
 
+        auto future = std::async(std::launch::async, updateParticleBatch, std::ref(particles), std::cref(walls), startIdx, endIdx);
+        futures.push_back(std::move(future));
+    }
+
+    // Wait for all asynchronous tasks to complete
+    for (auto& future : futures) {
+        future.get();
+    }
+}
+
+void updateParticlesDynamicBatch(std::vector<Particle>& particles, const std::vector<Wall>& walls) {
+    const size_t numParticles = particles.size();
+    const size_t numThreads = std::thread::hardware_concurrency();
+    const size_t batchSize = (numParticles + numThreads - 1) / numThreads;
+
+    std::vector<std::future<void>> futures;
+
+    for (size_t startIdx = 0; startIdx < numParticles; startIdx += batchSize) {
+        size_t endIdx = std::min(startIdx + batchSize, numParticles);
         auto future = std::async(std::launch::async, updateParticleBatch, std::ref(particles), std::cref(walls), startIdx, endIdx);
         futures.push_back(std::move(future));
     }
@@ -485,10 +498,11 @@ int main() {
         // -- END GUI STUFF --
 
         // Update particle positions and handle collisions
-        updateParticles(particles, walls); // single threaded implementation
+        // updateParticles(particles, walls); // single threaded implementation
 
         // Update particle positions and handle collisions asynchronously in batches
         // updateParticlesAsyncBatch(particles, walls, 10000);  // Adjust batch size as needed
+        updateParticlesDynamicBatch(particles, walls); 
         frameClock.restart();
         // Clear the window
         window.clear();
