@@ -164,7 +164,8 @@ void update_particles(std::vector<Particle>& particles, const std::vector<Wall>&
 
     for (size_t start = 0; start < num_particles; start += batch_size) {
         size_t end = std::min(start + batch_size, num_particles);
-        auto future = std::async(std::launch::async, update_particle_batch, std::ref(particles), std::cref(walls), start, end);
+        auto future = std::async(std::launch::async, update_particle_batch, 
+            std::ref(particles), std::cref(walls), start, end);
         futures.push_back(std::move(future));
     }
 
