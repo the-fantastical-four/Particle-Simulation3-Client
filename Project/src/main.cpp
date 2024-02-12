@@ -152,7 +152,12 @@ void update_particle_batch(std::vector<Particle>& particles, const std::vector<W
 
 void update_particles(std::vector<Particle>& particles, const std::vector<Wall>& walls) {
     const size_t num_particles = particles.size();
-    const size_t num_threads = std::thread::hardware_concurrency();
+    size_t num_threads = std::thread::hardware_concurrency();
+
+    if (num_threads == 0) {
+        num_threads = 1; 
+    }
+
     const size_t batch_size = (num_particles + num_threads - 1) / num_threads;
 
     std::vector<std::future<void>> futures;
