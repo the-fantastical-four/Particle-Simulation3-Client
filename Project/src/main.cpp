@@ -169,6 +169,31 @@ void update_particles(std::vector<Particle>& particles, const std::vector<Wall>&
     }
 }
 
+void render_batch(vector<Particle>& particles, sf::RenderWindow& window, int start, int end) {
+    for (int i = start; i < end; i++) {
+        window.draw(particles[i].shape); 
+    }
+}
+
+void render_particles(std::vector<Particle>& particles, sf::RenderWindow& window) {
+    const size_t num_particles = particles.size();
+    const size_t num_threads = std::thread::hardware_concurrency();
+    const size_t batch_size = (num_particles + num_threads - 1) / num_threads;
+
+    std::vector<std::future<void>> futures;
+
+    for (size_t start = 0; start < num_particles; start += batch_size) {
+        size_t end = std::min(start + batch_size, num_particles);
+        auto future = std::async(std::launch::async, render_batch, ref(particles), ref(window), start, end);
+        futures.push_back(std::move(future));
+    }
+
+    // Wait for all asynchronous tasks to complete
+    for (auto& future : futures) {
+        future.get();
+    }
+}
+
 void show_frame_rate() {
 	ImGui::Begin("Frame Rate");
 	ImGui::Text("Frame Rate: %.2f", 1.0f / fpsClock.restart().asSeconds());
@@ -421,14 +446,19 @@ int main() {
         window.clear();
 
         // Draw particles
-        for (const auto& particle : particles) {
-            window.draw(particle.shape);
-        }
+        // for (const auto& particle : particles) {
+        //     window.draw(particle.shape);
+        // }
+        window.setActive(false); 
+
+        render_particles(particles, window);
 
         // Draw walls
         for (const auto& wall : walls) {
             window.draw(wall.shape);
         }
+
+        window.setActive(true);
 
         // Display the contents of the window
         ImGui::SFML::Render(window);
