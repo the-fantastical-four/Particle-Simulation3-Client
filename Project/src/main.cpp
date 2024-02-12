@@ -14,11 +14,7 @@ using namespace std;
 #define HEIGHT 720
 #define SIZE 4
 
-enum MenuState {
-    MENU    
-};
-
-sf::Clock frameClock;
+sf::Clock frame_clock;
 sf::Clock fpsClock; 
 
 struct Wall {
@@ -60,12 +56,12 @@ struct Particle {
     }
 
     // Set angle in degrees
-    void set_angle_velocity(float angleDegrees) {
-        float angleRadians = angleDegrees * 3.14159 / 180;
+    void set_angle_velocity(float angle_degrees) {
+        float angle_radians = angle_degrees * 3.14159 / 180;
 
         // Set velocity based on speed and angle
-        velocity.x = speed * std::cos(angleRadians);
-        velocity.y = speed * -std::sin(angleRadians);
+        velocity.x = speed * std::cos(angle_radians);
+        velocity.y = speed * -std::sin(angle_radians);
     }
 };
 
@@ -73,7 +69,7 @@ struct Particle {
     This function handles the bouncing of particles on the screen
     edges and walls. 
 */
-void handleCollision(Particle& particle, const sf::Vector2u& windowSize, bool is_collide, float delta) {
+void handle_collision(Particle& particle, const sf::Vector2u& window_size, bool is_collide, float delta) {
     sf::FloatRect bounds = particle.shape.getGlobalBounds();
 
     // Check collisions with window boundaries
@@ -93,25 +89,6 @@ void handleCollision(Particle& particle, const sf::Vector2u& windowSize, bool is
         particle.velocity = -particle.velocity;
         particle.shape.move(particle.velocity * delta); 
     }
-}
-
-/*
-    This function returns the position of the particle 
-    relative to the direction it is moving in. For example,
-    if a particle is moving upwards and to the right, its x 
-    and y values will be the right bound and top bound of the 
-    particle respectively. 
-*/
-sf::Vector2f get_relative_pos(Particle particle) {
-    sf::FloatRect bounds = particle.shape.getGlobalBounds();
-
-    float temp_x;
-    float temp_y;
-
-    temp_x = particle.velocity.x > 0 ? bounds.left + bounds.width : bounds.left; 
-    temp_y = particle.velocity.y > 0 ? bounds.top + bounds.height : bounds.top; 
-
-    return sf::Vector2f(temp_x, temp_y);
 }
 
 /*
@@ -149,37 +126,11 @@ sf::Vector2f get_offset(Particle particle, Wall wall, float delta) {
     return particle.velocity * delta; 
 }
 
-/*
-    This function handles updating the position of particles. 
-    AKA this is what makes the particles move with collision. 
-*/
-void updateParticles(std::vector<Particle>& particles, const std::vector<Wall>& walls) {
-    sf::Time elapsed_time = frameClock.getElapsedTime();
+void update_particle_batch(std::vector<Particle>& particles, const std::vector<Wall>& walls, size_t start, size_t end) {
+    sf::Time elapsed_time = frame_clock.getElapsedTime(); // frameClock.reset(); 
     float delta = elapsed_time.asSeconds();
 
-    for (auto& particle : particles) {
-        sf::Vector2f offset = particle.velocity * delta;
-        bool collide_wall = false; 
-
-        for (auto& wall : walls) {
-            sf::Vector2f temp = get_offset(particle, wall, delta); 
-            if (temp != offset) {
-                offset = temp; 
-                collide_wall = true; 
-                break; 
-            }
-        }
-        
-        particle.shape.move(offset);
-        handleCollision(particle, { WIDTH, HEIGHT }, collide_wall, delta);
-    }
-}
-
-void updateParticleBatch(std::vector<Particle>& particles, const std::vector<Wall>& walls, size_t startIdx, size_t endIdx) {
-    sf::Time elapsed_time = frameClock.getElapsedTime(); // frameClock.reset(); 
-    float delta = elapsed_time.asSeconds();
-
-    for (size_t i = startIdx; i < endIdx; i++) {
+    for (size_t i = start; i < end; i++) {
         Particle& particle = particles[i];
 
         sf::Vector2f offset = particle.velocity * delta;
@@ -195,42 +146,20 @@ void updateParticleBatch(std::vector<Particle>& particles, const std::vector<Wal
         }
 
         particle.shape.move(offset);
-        handleCollision(particle, { WIDTH, HEIGHT }, collide_wall, delta);
+        handle_collision(particle, { WIDTH, HEIGHT }, collide_wall, delta);
     }
 }
 
-void updateParticlesAsyncBatch(std::vector<Particle>& particles, const std::vector<Wall>& walls, size_t batchSize) {
-
-    // Calculate the number of batches
-    size_t numParticles = particles.size();
-    size_t numBatches = (numParticles + batchSize - 1) / batchSize;
-
-    std::vector<std::future<void>> futures;
-
-    for (size_t batchIdx = 0; batchIdx < numBatches; batchIdx++) {
-        size_t startIdx = batchIdx * batchSize;
-        size_t endIdx = std::min((batchIdx + 1) * batchSize, numParticles);
-
-        auto future = std::async(std::launch::async, updateParticleBatch, std::ref(particles), std::cref(walls), startIdx, endIdx);
-        futures.push_back(std::move(future));
-    }
-
-    // Wait for all asynchronous tasks to complete
-    for (auto& future : futures) {
-        future.get();
-    }
-}
-
-void updateParticlesDynamicBatch(std::vector<Particle>& particles, const std::vector<Wall>& walls) {
-    const size_t numParticles = particles.size();
-    const size_t numThreads = std::thread::hardware_concurrency();
-    const size_t batchSize = (numParticles + numThreads - 1) / numThreads;
+void update_particles(std::vector<Particle>& particles, const std::vector<Wall>& walls) {
+    const size_t num_particles = particles.size();
+    const size_t num_threads = std::thread::hardware_concurrency();
+    const size_t batch_size = (num_particles + num_threads - 1) / num_threads;
 
     std::vector<std::future<void>> futures;
 
-    for (size_t startIdx = 0; startIdx < numParticles; startIdx += batchSize) {
-        size_t endIdx = std::min(startIdx + batchSize, numParticles);
-        auto future = std::async(std::launch::async, updateParticleBatch, std::ref(particles), std::cref(walls), startIdx, endIdx);
+    for (size_t start = 0; start < num_particles; start += batch_size) {
+        size_t end = std::min(start + batch_size, num_particles);
+        auto future = std::async(std::launch::async, update_particle_batch, std::ref(particles), std::cref(walls), start, end);
         futures.push_back(std::move(future));
     }
 
@@ -262,41 +191,29 @@ int main() {
     float wall_x2 = 0.f;
     float wall_y2 = 0.f;
 
-    int batch_size_c = 0;
-    // Batch spawning case 1 variables
-    float batch_start_x_c = 100;//0.f;
-    float batch_start_y_c = 100;//0.f;
-    float batch_end_x_c = 500;//0.f;
-    float batch_end_y_c = 400;//0.f;
-    float batch_start_angle_c = 55;//0.f;
-    float batch_end_angle_c = 0.f;
-    float batch_start_speed_c = 65;//0.f;
-    float batch_start_velocity_c = 0;//0.f;
-    float batch_end_velocity_c = 1000;//0.f;
-
-    int batch_size_b = 1000;
-    // Batch spawning case 2 variables
-    float batch_start_x_b = 100;//0.f;
-    float batch_start_y_b = 100;//0.f;
-    float batch_end_x_b = 500;//0.f;
-    float batch_end_y_b = 400;//0.f;
-    float batch_start_angle_b = 90.f;//0.f;
-    float batch_end_angle_b = 0.f;
-    float batch_start_speed_b = 65;//0.f;
-    float batch_start_velocity_b = 1000;//0.f;
-    float batch_end_velocity_b = 1000;//0.f;
-
-    int batch_size_a = 0;
-    // Batch spawning case 3 variables
+    int batch_size_a = 1000;
     float batch_start_x_a = 100;//0.f;
     float batch_start_y_a = 100;//0.f;
     float batch_end_x_a = 500;//0.f;
     float batch_end_y_a = 400;//0.f;
-    float batch_start_angle_a = 55;//0.f;
-    float batch_end_angle_a = 0.f;
-    float batch_start_speed_a = 65;//0.f;
-    float batch_start_velocity_a = 0;//0.f;
-    float batch_end_velocity_a = 1000;//0.f;
+    float batch_angle_a = 45;//0.f;
+    float batch_speed_a = 100;//0.f;
+
+    int batch_size_b = 1000;
+    float batch_x_b = 640;//0.f;
+    float batch_y_b = 360;//0.f;
+    float batch_start_angle_b = 360.f;//0.f;
+    float batch_end_angle_b = 0.f;
+    float batch_speed_b = 500;//0.f;
+
+    int batch_size_c = 1000;
+    float batch_x_c = 100;//0.f;
+    float batch_y_c = 100;//0.f;
+    float batch_angle_c = 55;//0.f;
+    float batch_start_speed_c = 100.f;
+    float batch_end_speed_c = 500.f;
+
+
     std::vector<Particle> particles;
     std::vector<Wall> walls;
 
@@ -335,13 +252,13 @@ int main() {
 
         ImGui::Columns(1); // end table
 
-        // Confirm Button for individual particle spawning
         if (ImGui::Button("Spawn Particle")) {
             Particle particle = Particle(particle_x, particle_y,
                 particle_speed, particle_angle);
             particles.push_back(particle);
         }
         ImGui::NewLine();
+
         // Input Wall 
         ImGui::Text("Spawn Wall");
         ImGui::Columns(2, "Spawn Wall", false);
@@ -370,22 +287,20 @@ int main() {
         ImGui::Text("Case 1 Batch Spawn Particle");
         ImGui::Columns(2, "Spawn Batch Particle", false);
         ImGui::InputInt("Batch Size ", &batch_size_a);
-        //ImGui::InputInt("Batch Size ", &batch_size_a, 0, 0, ImGuiInputTextFlags_CharsDecimal); // Specify ImGuiInputTextFlags_CharsDecimal flag
-
-        ImGui::NextColumn();
-        ImGui::InputFloat("Start Velocity ", &batch_start_speed_a);
+        ImGui::NextColumn(); 
         ImGui::NextColumn();
         ImGui::InputFloat("Start x ", &batch_start_x_a);
         ImGui::NextColumn();
         ImGui::InputFloat("Start y ", &batch_start_y_a);
         ImGui::NextColumn();
-
         ImGui::InputFloat("End x ", &batch_end_x_a);
         ImGui::NextColumn();
         ImGui::InputFloat("End y ", &batch_end_y_a);
         ImGui::NextColumn();
-        ImGui::InputFloat("Start Angle ", &batch_start_angle_a);
+        ImGui::InputFloat("Angle ", &batch_angle_a);
         ImGui::NextColumn();
+        ImGui::InputFloat("Velocity ", &batch_speed_a);
+
         ImGui::Columns(1); // end table
 
         // Confirm Button for batch spawning
@@ -410,7 +325,7 @@ int main() {
                 float spawn_x = batch_start_x_a + i * step_size * cos(line_angle);
                 float spawn_y = batch_start_y_a + i * step_size * sin(line_angle);
 
-                Particle particle = Particle(spawn_x, spawn_y, batch_start_speed_a, batch_start_angle_a);
+                Particle particle = Particle(spawn_x, spawn_y, batch_speed_a, batch_angle_a);
                 particles.push_back(particle);
             }
         }
@@ -423,16 +338,17 @@ int main() {
 
         ImGui::InputInt("Batch Size  ", &batch_size_b);
         ImGui::NextColumn();
-        ImGui::InputFloat("Start Velocity  ", &batch_start_speed_b);
+        ImGui::NextColumn(); 
+        ImGui::InputFloat("x  ", &batch_x_b);
         ImGui::NextColumn();
-        ImGui::InputFloat("Start x  ", &batch_start_x_b);
-        ImGui::NextColumn();
-        ImGui::InputFloat("Start y  ", &batch_start_y_b);
+        ImGui::InputFloat("y  ", &batch_y_b);
         ImGui::NextColumn();
 
         ImGui::InputFloat("Start Angle  ", &batch_start_angle_b);
         ImGui::NextColumn();
         ImGui::InputFloat("End Angle  ", &batch_end_angle_b);
+        ImGui::NextColumn();
+        ImGui::InputFloat("Velocity  ", &batch_speed_b);
 
         ImGui::Columns(1); // end table
 
@@ -442,10 +358,10 @@ int main() {
             float current_angle = batch_start_angle_b;
 
             for (int i = 0; i < batch_size_b; ++i) {
-                float spawn_x = batch_start_x_b;
-                float spawn_y = batch_start_y_b;
+                float spawn_x = batch_x_b;
+                float spawn_y = batch_y_b;
 
-                Particle particle = Particle(spawn_x, spawn_y, batch_start_speed_b, current_angle);
+                Particle particle = Particle(spawn_x, spawn_y, batch_speed_b, current_angle);
                 particles.push_back(particle);
 
                 current_angle += angle_increment;
@@ -459,16 +375,17 @@ int main() {
 
         ImGui::InputInt("Batch Size", &batch_size_c);
         ImGui::NextColumn();
-        ImGui::InputFloat("Start Angle", &batch_start_angle_c);
+        ImGui::NextColumn(); 
+        ImGui::InputFloat("x", &batch_x_c);
         ImGui::NextColumn();
-        ImGui::InputFloat("Start x", &batch_start_x_c);
-        ImGui::NextColumn();
-        ImGui::InputFloat("Start y", &batch_start_y_c);
+        ImGui::InputFloat("y", &batch_y_c);
         ImGui::NextColumn();
 
-        ImGui::InputFloat("Start Velocity", &batch_start_velocity_c);
+        ImGui::InputFloat("Start Velocity", &batch_start_speed_c);
         ImGui::NextColumn();
-        ImGui::InputFloat("End Velocity", &batch_end_velocity_c);
+        ImGui::InputFloat("End Velocity", &batch_end_speed_c);
+        ImGui::NextColumn();
+        ImGui::InputFloat("Angle", &batch_angle_c);
 
         ImGui::Columns(1); // end table
 
@@ -477,13 +394,13 @@ int main() {
             // Calculate the velocity increment for each particle
             float velocity_increment = 1;
             if (batch_size_c > 1) {
-                velocity_increment = (batch_end_velocity_c - batch_start_velocity_c) / (batch_size_c - 1);
+                velocity_increment = (batch_end_speed_c - batch_start_speed_c) / (batch_size_c - 1);
             }
             for (int i = 0; i < batch_size_c; ++i) {
                 // Interpolate velocity for the current particle
-                float current_velocity = batch_start_velocity_c + i * velocity_increment;
+                float current_velocity = batch_start_speed_c + i * velocity_increment;
 
-                Particle particle = Particle(batch_start_x_c, batch_start_y_c, current_velocity, batch_start_angle_c);
+                Particle particle = Particle(batch_x_c, batch_y_c, current_velocity, batch_angle_c);
                 particles.push_back(particle);
             }
         }
@@ -497,13 +414,9 @@ int main() {
 
         // -- END GUI STUFF --
 
-        // Update particle positions and handle collisions
-        // updateParticles(particles, walls); // single threaded implementation
+        update_particles(particles, walls); 
+        frame_clock.restart();
 
-        // Update particle positions and handle collisions asynchronously in batches
-        // updateParticlesAsyncBatch(particles, walls, 10000);  // Adjust batch size as needed
-        updateParticlesDynamicBatch(particles, walls); 
-        frameClock.restart();
         // Clear the window
         window.clear();
 
