@@ -85,7 +85,7 @@ void handle_collision(Particle& particle, const sf::Vector2u& window_size, bool 
         particle.shape.move(particle.velocity * delta);
     }
 
-    if (is_collide) {
+    else if (is_collide) {
         particle.velocity = -particle.velocity;
         particle.shape.move(particle.velocity * delta); 
     }
@@ -175,16 +175,18 @@ void update_particles(std::vector<Particle>& particles, const std::vector<Wall>&
     }
 }
 
-void show_frame_rate() {
-	ImGui::Begin("Frame Rate");
-	ImGui::Text("Frame Rate: %.2f", 1.0f / fpsClock.restart().asSeconds());
-	ImGui::End();
+void show_frame_rate(float fps) {
+    ImGui::Begin("Frame Rate");
+    ImGui::Text("Frame Rate: %.2f", fps);
+    ImGui::End();
 }
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Particle Bouncing");
     ImGui::SFML::Init(window);
     window.setFramerateLimit(60);
+    int frame_count = 0; 
+    float fps = 0.f; 
 
     // to store input
     float particle_x = 0.f;
@@ -238,23 +240,27 @@ int main() {
         ImGui::SFML::Update(window, deltaClock.restart());
 
         // -- BEGIN GUI STUFF --
+        if (fpsClock.getElapsedTime().asSeconds() >= 0.5f) {
+            fps = frame_count / fpsClock.restart().asSeconds(); 
+            frame_count = 0; 
+        }
 
-        show_frame_rate();
+        show_frame_rate(fps);
         ImGui::Begin("Menu");
         ImGui::Text("Spawn Particle");
 
         // Input Particle
         ImGui::Columns(2, "Spawn Particle", false);
 
-        ImGui::InputFloat("x", &particle_x);
+        ImGui::InputFloat(" x", &particle_x);
         ImGui::NextColumn();
-        ImGui::InputFloat("y", &particle_y);
+        ImGui::InputFloat(" y", &particle_y);
 
         ImGui::NextColumn();
 
-        ImGui::InputFloat("Angle", &particle_angle);
+        ImGui::InputFloat(" Angle", &particle_angle);
         ImGui::NextColumn();
-        ImGui::InputFloat("Velocity", &particle_speed);
+        ImGui::InputFloat(" Velocity", &particle_speed);
 
         ImGui::Columns(1); // end table
 
@@ -439,6 +445,8 @@ int main() {
         // Display the contents of the window
         ImGui::SFML::Render(window);
         window.display();
+
+        frame_count++; 
     }
 
     ImGui::SFML::Shutdown();

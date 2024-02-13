@@ -1,31 +1,4 @@
-﻿  main.cpp
+﻿  pool.cpp
+  main.cpp
 C:\Sophia\UNI\YEAR 4\TERM 2\STDISCM\Particle-Simulation\Project\src\main.cpp(60,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\type_traits(1741,98): warning C4244: 'argument': conversion from 'unsigned __int64' to 'int', possible loss of data
-  (compiling source file 'src/main.cpp')
-  C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\type_traits(1741,98):
-  the template instantiation context (the oldest one first) is
-  	C:\Sophia\UNI\YEAR 4\TERM 2\STDISCM\Particle-Simulation\Project\src\main.cpp(187,28):
-  	see reference to function template instantiation 'std::future<void> std::async<void(__cdecl &)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>,std::reference_wrapper<sf::RenderWindow>,size_t&,size_t&>(std::launch,_Fty,std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>> &&,std::reference_wrapper<sf::RenderWindow> &&,size_t &,size_t &)' being compiled
-          with
-          [
-              _Fty=void (__cdecl &)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int)
-          ]
-  	C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\future(1449,96):
-  	see reference to class template instantiation 'std::_Fake_no_copy_callable_adapter<void (__cdecl &)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>,std::reference_wrapper<sf::RenderWindow>,size_t &,size_t &>' being compiled
-  	C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\future(1422,10):
-  	while compiling class template member function 'void std::_Fake_no_copy_callable_adapter<void (__cdecl &)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>,std::reference_wrapper<sf::RenderWindow>,size_t &,size_t &>::operator ()(void)'
-  		C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\type_traits(1731,5):
-  		see the first reference to 'std::_Fake_no_copy_callable_adapter<void (__cdecl &)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>,std::reference_wrapper<sf::RenderWindow>,size_t &,size_t &>::operator ()' in 'std::invoke'
-  	C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\future(1423,16):
-  	see reference to function template instantiation 'void std::_Invoke_stored<void(__cdecl *)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>,std::reference_wrapper<sf::RenderWindow>,unsigned __int64,unsigned __int64>(std::tuple<void (__cdecl *)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>,std::reference_wrapper<sf::RenderWindow>,unsigned __int64,unsigned __int64> &&)' being compiled
-  	C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\future(1396,12):
-  	see reference to function template instantiation 'void std::_Invoke_stored_explicit<void(__cdecl *)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>,std::reference_wrapper<sf::RenderWindow>,unsigned __int64,unsigned __int64,0,1,2,3,4>(std::tuple<void (__cdecl *)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>,std::reference_wrapper<sf::RenderWindow>,unsigned __int64,unsigned __int64> &&,std::integer_sequence<size_t,0,1,2,3,4>)' being compiled
-  	C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.38.33130\include\future(1390,17):
-  	see reference to function template instantiation 'void std::invoke<void(__cdecl *)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>,std::reference_wrapper<sf::RenderWindow>,unsigned __int64,unsigned __int64>(_Callable &&,_Ty1 &&,std::reference_wrapper<sf::RenderWindow> &&,unsigned __int64 &&,unsigned __int64 &&) noexcept(false)' being compiled
-          with
-          [
-              _Callable=void (__cdecl *)(std::vector<Particle,std::allocator<Particle>> &,sf::RenderWindow &,int,int),
-              _Ty1=std::reference_wrapper<std::vector<Particle,std::allocator<Particle>>>
-          ]
-  
   Project.vcxproj -> C:\Sophia\UNI\YEAR 4\TERM 2\STDISCM\Particle-Simulation\Project\x64\Debug\Project.exe
