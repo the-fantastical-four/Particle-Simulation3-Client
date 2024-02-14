@@ -199,27 +199,27 @@ int main() {
     float wall_x2 = 0.f;
     float wall_y2 = 0.f;
 
-    int batch_size_a = 1000;
-    float batch_start_x_a = 100;//0.f;
-    float batch_start_y_a = 100;//0.f;
-    float batch_end_x_a = 500;//0.f;
-    float batch_end_y_a = 400;//0.f;
-    float batch_angle_a = 45;//0.f;
-    float batch_speed_a = 100;//0.f;
+    int batch_size_a = 0;
+    float batch_start_x_a = 0.f;
+    float batch_start_y_a = 0.f;
+    float batch_end_x_a = 0.f;
+    float batch_end_y_a = 0.f;
+    float batch_angle_a = 0.f;
+    float batch_speed_a = 0.f;
 
-    int batch_size_b = 1000;
-    float batch_x_b = 640;//0.f;
-    float batch_y_b = 360;//0.f;
-    float batch_start_angle_b = 360.f;//0.f;
+    int batch_size_b = 0;
+    float batch_x_b = 0.f;
+    float batch_y_b = 0.f;
+    float batch_start_angle_b = 0.f;
     float batch_end_angle_b = 0.f;
-    float batch_speed_b = 500;//0.f;
+    float batch_speed_b = 0.f;
 
-    int batch_size_c = 1000;
-    float batch_x_c = 100;//0.f;
-    float batch_y_c = 100;//0.f;
-    float batch_angle_c = 55;//0.f;
-    float batch_start_speed_c = 100.f;
-    float batch_end_speed_c = 500.f;
+    int batch_size_c = 0;
+    float batch_x_c = 0.f;
+    float batch_y_c = 0.f;
+    float batch_angle_c = 0.f;
+    float batch_start_speed_c = 0.f;
+    float batch_end_speed_c = 0.f;
 
 
     std::vector<Particle> particles;
