@@ -1,4 +1,0 @@
-﻿  pool.cpp
-  main.cpp
-C:\Sophia\UNI\YEAR 4\TERM 2\STDISCM\Particle-Simulation\Project\src\main.cpp(60,29): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Project.vcxproj -> C:\Sophia\UNI\YEAR 4\TERM 2\STDISCM\Particle-Simulation\Project\x64\Debug\Project.exe
