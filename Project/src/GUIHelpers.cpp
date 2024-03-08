@@ -1,6 +1,44 @@
 #include "GUIHelpers.h"
 #include "imgui.h"
 
+void show_explorer_mode(sf::Sprite& sprite, sf::RenderWindow& window, bool isExplorerMode) {
+    ImGui::NewLine();
+
+    if (isExplorerMode) {
+        const float moveSpeed = 5.0f; // Adjust speed as needed
+        sf::Vector2f movement(0.f, 0.f);
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+            movement.y -= moveSpeed;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+            movement.y += moveSpeed;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+            movement.x -= moveSpeed;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+            movement.x += moveSpeed;
+        }
+
+        // Calculate potential new position
+        sf::Vector2f newPosition = sprite.getPosition() + movement;
+
+        // Ensure the sprite stays within the window boundaries
+        sf::FloatRect spriteBounds = sprite.getGlobalBounds();
+        float minX = 0;
+        float maxX = window.getSize().x - spriteBounds.width;
+        float minY = 0;
+        float maxY = window.getSize().y - spriteBounds.height;
+
+        // Clamp the new position within the window boundaries
+        newPosition.x = std::min(std::max(newPosition.x, minX), maxX);
+        newPosition.y = std::min(std::max(newPosition.y, minY), maxY);
+
+        sprite.setPosition(newPosition);
+    }
+}
+
 void show_particle_spawner_menu() {
     ImGui::Text("Spawn Particle");
     ImGui::Columns(2, nullptr, false);

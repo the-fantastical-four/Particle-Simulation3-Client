@@ -50,6 +50,22 @@ int main() {
 
     sf::Clock deltaClock;
 
+    // Load a texture from a file
+    sf::Texture texture;
+    if (!texture.loadFromFile("include/pikachu.png")) {
+        // error handling
+        std::cout << "Load failed" << std::endl;
+        system("pause");
+    }
+
+    // Create a sprite and apply the texture
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    sprite.setScale(0.5f, 0.5f); 
+    sprite.setPosition(0, 0);
+
+    bool isExplorerMode = false;
+
     // Game loop
     while (window.isOpen()) {
         sf::Event event;
@@ -72,7 +88,49 @@ int main() {
         show_frame_rate(fps);
 
         ImGui::Begin("Menu");
-        
+
+        if (ImGui::Button("Explorer Mode")) {
+            isExplorerMode = !isExplorerMode;
+            std::cout << "explorer mode: " << isExplorerMode << std::endl;
+        }
+
+        ImGui::NewLine();
+
+        if (isExplorerMode) {
+            const float moveSpeed = 5.0f; // Adjust speed as needed
+            sf::Vector2f movement(0.f, 0.f);
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+                movement.y -= moveSpeed;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+                movement.y += moveSpeed;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+                movement.x -= moveSpeed;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+                movement.x += moveSpeed;
+            }
+
+            // Calculate potential new position
+            sf::Vector2f newPosition = sprite.getPosition() + movement;
+
+            // Ensure the sprite stays within the window boundaries
+            sf::FloatRect spriteBounds = sprite.getGlobalBounds();
+            float minX = 0;
+            float maxX = window.getSize().x - spriteBounds.width;
+            float minY = 0;
+            float maxY = window.getSize().y - spriteBounds.height;
+
+            // Clamp the new position within the window boundaries
+            newPosition.x = std::min(std::max(newPosition.x, minX), maxX);
+            newPosition.y = std::min(std::max(newPosition.y, minY), maxY);
+
+            sprite.setPosition(newPosition);
+        }
+
+        //show_explorer_mode(sprite, window, &isExplorerMode);
         show_particle_spawner_menu();
         show_wall_spawner_menu(); 
         show_batch_spawn_case_1();
@@ -98,6 +156,22 @@ int main() {
         // Draw walls
         for (const auto& wall : walls) {
             window.draw(wall.shape);
+        }
+
+        // Draw the sprite - Ensure this line is added
+        if (isExplorerMode) {
+            window.draw(sprite);
+
+            //Draw the red border around sprite
+            sf::FloatRect spriteBounds = sprite.getGlobalBounds();
+            sf::RectangleShape border(sf::Vector2f(spriteBounds.width + 10, spriteBounds.height + 10)); // 10 is the extra size for the border, adjust as needed
+
+            border.setFillColor(sf::Color::Transparent); // Fill color is transparent, only the border will be visible
+            border.setOutlineColor(sf::Color::Red); // Red border color
+            border.setOutlineThickness(5); // Thickness of the border, adjust as needed
+            border.setPosition(sprite.getPosition().x - 5, sprite.getPosition().y - 5); // Adjust position to align with the sprite, considering the border thickness
+
+            window.draw(border);
         }
 
         // Display the contents of the window
