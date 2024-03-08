@@ -247,6 +247,7 @@
     <ClInclude Include="src\GUIHelpers.h" />
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\Physics.h" />
+    <ClInclude Include="src\SpriteManager.h" />
     <ClInclude Include="src\Wall.h" />
   </ItemGroup>
   <ItemGroup>
@@ -262,6 +263,7 @@
     </ClCompile>
     <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\Physics.cpp" />
+    <ClCompile Include="src\SpriteManager.cpp" />
     <ClCompile Include="src\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
