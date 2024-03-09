@@ -42,13 +42,13 @@ void show_explorer_mode(sf::Sprite& sprite, sf::RenderWindow& window, bool isExp
 void show_particle_spawner_menu() {
     ImGui::Text("Spawn Particle");
     ImGui::Columns(2, nullptr, false);
-    ImGui::InputFloat("x", &particle_x);
+    ImGui::InputFloat("x ", &particle_x);
     ImGui::NextColumn();
-    ImGui::InputFloat("y", &particle_y);
+    ImGui::InputFloat("y ", &particle_y);
     ImGui::NextColumn();
-    ImGui::InputFloat("Angle", &particle_angle);
+    ImGui::InputFloat("Angle ", &particle_angle);
     ImGui::NextColumn();
-    ImGui::InputFloat("Velocity", &particle_speed);
+    ImGui::InputFloat("Velocity ", &particle_speed);
     ImGui::Columns(1);
     if (ImGui::Button("Spawn Particle")) {
         particles.push_back(Particle(particle_x, particle_y, particle_speed, particle_angle));
@@ -91,9 +91,9 @@ void show_batch_spawn_case_1() {
     ImGui::NextColumn();
     ImGui::InputFloat("End y ", &batch_end_y_a);
     ImGui::NextColumn();
-    ImGui::InputFloat("Angle ", &batch_angle_a);
+    ImGui::InputFloat(" Angle", &batch_angle_a);
     ImGui::NextColumn();
-    ImGui::InputFloat("Velocity ", &batch_speed_a);
+    ImGui::InputFloat(" Velocity", &batch_speed_a);
 
     ImGui::Columns(1); // end table
 

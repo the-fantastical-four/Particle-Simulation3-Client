@@ -24,8 +24,10 @@ void SpriteManager::update(sf::RenderWindow& window, bool isExplorerMode) {
 
         sf::Vector2f newPosition = sprite.getPosition() + movement;
         sf::FloatRect spriteBounds = sprite.getGlobalBounds();
-        float minX = 0, maxX = window.getSize().x - spriteBounds.width;
-        float minY = 0, maxY = window.getSize().y - spriteBounds.height;
+        // changed to width and height to avoid particles and sprite going out of bounds in explorer mode
+        // when particles are spawned
+        float minX = 0, maxX = WIDTH - spriteBounds.width; 
+        float minY = 0, maxY = HEIGHT - spriteBounds.height;
 
         newPosition.x = std::min(std::max(newPosition.x, minX), maxX);
         newPosition.y = std::min(std::max(newPosition.y, minY), maxY);

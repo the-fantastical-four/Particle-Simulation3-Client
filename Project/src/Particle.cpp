@@ -3,7 +3,7 @@
 
 Particle::Particle(float x, float y, float speed, float angle) : x(x), y(y), speed(speed) {
     shape.setSize(sf::Vector2f(SIZE, SIZE));
-    shape.setFillColor(sf::Color::Cyan);
+    shape.setFillColor(sf::Color::White);
     // invert y axis 
     float adjusted_y = (HEIGHT - SIZE - y <= 0) ? HEIGHT - y : HEIGHT - SIZE - y;
     shape.setPosition(x, adjusted_y);

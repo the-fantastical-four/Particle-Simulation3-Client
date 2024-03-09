@@ -71,6 +71,11 @@ int main() {
     SpriteManager spriteManager("include/pikachu.png", sf::Vector2f(0.5f, 0.5f), sf::Vector2f(0, 0));
     bool isExplorerMode = false;
 
+    // Create background 
+    sf::RectangleShape background;
+    background.setSize(sf::Vector2f(WIDTH, HEIGHT));
+    background.setFillColor(sf::Color::Cyan);
+
     // Game loop
     while (window.isOpen()) {
         sf::Event event;
@@ -116,6 +121,9 @@ int main() {
 
         // Clear the window
         window.clear();
+
+        // Render background 
+        window.draw(background); 
 
         // Update and draw the sprite using SpriteManager
         spriteManager.update(window, isExplorerMode);

@@ -4,6 +4,9 @@
 
 #include <SFML/Graphics.hpp>
 
+extern const int HEIGHT;
+extern const int WIDTH;
+
 class SpriteManager {
 public:
     SpriteManager(const std::string& texturePath, const sf::Vector2f& scale, const sf::Vector2f& initialPosition);
