@@ -52,22 +52,6 @@ int main() {
 
     sf::Clock deltaClock;
 
-    /*
-    // Load a texture from a file
-    sf::Texture texture;
-    if (!texture.loadFromFile("include/pikachu.png")) {
-        // error handling
-        std::cout << "Load failed" << std::endl;
-        system("pause");
-    }
-
-    // Create a sprite and apply the texture
-    sf::Sprite sprite;
-    sprite.setTexture(texture);
-    sprite.setScale(0.5f, 0.5f); 
-    sprite.setPosition(0, 0);
-    */
-
     SpriteManager spriteManager("include/pikachu.png", sf::Vector2f(0.5f, 0.5f), sf::Vector2f(0, 0));
     bool isExplorerMode = false;
 
@@ -100,11 +84,17 @@ int main() {
         ImGui::Begin("Menu");
 
         if (ImGui::Button("Explorer Mode")) {
-            isExplorerMode = !isExplorerMode;
+            isExplorerMode = true;
             std::cout << "explorer mode: " << isExplorerMode << std::endl;
         }
 
-        //show_explorer_mode(sprite, window, &isExplorerMode);
+        ImGui::SameLine();
+
+        if (ImGui::Button("Developer Mode")) {
+            isExplorerMode = false;
+            std::cout << "explorer mode: " << isExplorerMode << std::endl;
+        }
+
         show_particle_spawner_menu();
         show_wall_spawner_menu(); 
         show_batch_spawn_case_1();
