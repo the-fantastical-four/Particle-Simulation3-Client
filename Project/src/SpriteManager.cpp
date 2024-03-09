@@ -41,7 +41,7 @@ void SpriteManager::draw(sf::RenderWindow& window, bool isExplorerMode) {
         const float peripheryHeight = 19 * 10; // 19 rows, each 10 pixels tall
 
         // Center the view on the sprite's current position
-        sf::Vector2f center(sprite.getPosition().x + sprite.getLocalBounds().width / 2, sprite.getPosition().y + sprite.getLocalBounds().height / 2);
+        sf::Vector2f center(sprite.getPosition().x + sprite.getGlobalBounds().width / 2, sprite.getPosition().y + sprite.getGlobalBounds().height / 2);
         sf::View view(center, sf::Vector2f(peripheryWidth, peripheryHeight));
 
         
@@ -50,12 +50,12 @@ void SpriteManager::draw(sf::RenderWindow& window, bool isExplorerMode) {
 
         //Draw the red border around sprite
         sf::FloatRect spriteBounds = sprite.getGlobalBounds();
-        sf::RectangleShape border(sf::Vector2f(spriteBounds.width + 10, spriteBounds.height + 10)); // 10 is the extra size for the border, adjust as needed
+        sf::RectangleShape border(sf::Vector2f(spriteBounds.width, spriteBounds.height)); // 10 is the extra size for the border, adjust as needed
 
         border.setFillColor(sf::Color::Transparent); // Fill color is transparent, only the border will be visible
         border.setOutlineColor(sf::Color::Red); // Red border color
-        border.setOutlineThickness(5); // Thickness of the border, adjust as needed
-        border.setPosition(sprite.getPosition().x - 5, sprite.getPosition().y - 5); // Adjust position to align with the sprite, considering the border thickness
+        border.setOutlineThickness(1); // Thickness of the border, adjust as needed
+        border.setPosition(sprite.getPosition().x, sprite.getPosition().y); // Adjust position to align with the sprite, considering the border thickness
 
         window.draw(border);
     } else {
