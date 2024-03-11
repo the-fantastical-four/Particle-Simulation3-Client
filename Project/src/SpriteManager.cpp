@@ -36,6 +36,12 @@ void SpriteManager::update(sf::RenderWindow& window, bool isExplorerMode) {
     }
 }
 
+std::future<void> SpriteManager::updateAsync(sf::RenderWindow& window, bool isExplorerMode) {
+    return std::async(std::launch::async, [this, &window, isExplorerMode]() {
+        update(window, isExplorerMode);
+        });
+}
+
 void SpriteManager::draw(sf::RenderWindow& window, bool isExplorerMode) {
     if (isExplorerMode) {
         // Periphery dimensions in pixels

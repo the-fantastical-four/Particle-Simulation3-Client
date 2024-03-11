@@ -68,7 +68,7 @@ void update_particle_batch(std::vector<Particle>& particles, const std::vector<W
     }
 }
 
-void update_particles(std::vector<Particle>& particles, const std::vector<Wall>& walls) {
+std::vector<std::future<void>> update_particles(std::vector<Particle>& particles, const std::vector<Wall>& walls) {
     const size_t num_particles = particles.size();
     size_t num_threads = std::thread::hardware_concurrency();
 
@@ -87,10 +87,6 @@ void update_particles(std::vector<Particle>& particles, const std::vector<Wall>&
         futures.push_back(std::move(future));
     }
 
-    // Move this to main thread so that updating sprite positions can be done 
-    // in parallel with this function 
-    // Wait for all asynchronous tasks to complete
-    for (auto& future : futures) {
-        future.get();
-    }
+    // return futures
+    return futures;
 }

@@ -107,8 +107,11 @@ int main() {
 
         // -- END GUI STUFF --
 
-        update_particles(particles, walls); 
-        frame_clock.restart();
+        // update particles 
+        std::vector<std::future<void>> particle_futures = update_particles(particles, walls);
+
+        // Update sprite in another thread 
+        std::future<void> sprite_future = spriteManager.updateAsync(window, isExplorerMode);
 
         // Clear the window
         window.clear();
@@ -116,18 +119,24 @@ int main() {
         // Render background 
         window.draw(background); 
 
-        // Update and draw the sprite using SpriteManager
-        spriteManager.update(window, isExplorerMode);
+        // wait for all threads to finish 
+        // wait for all particle calculations 
+        for (auto& futures : particle_futures) {
+            futures.get(); 
+        }
+
+        // wait for sprite position calculations
+        sprite_future.get();
+
+        // restart clock, don't move this or else it affects the position of the particles 
+        frame_clock.restart();
+
+        // Draw sprite 
         spriteManager.draw(window, isExplorerMode);
 
         // Draw particles
         for (const auto& particle : particles) {
             window.draw(particle.shape);
-        }
-
-        // Draw walls
-        for (const auto& wall : walls) {
-            window.draw(wall.shape);
         }
 
     
