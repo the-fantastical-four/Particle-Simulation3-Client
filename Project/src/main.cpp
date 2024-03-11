@@ -95,12 +95,13 @@ int main() {
             std::cout << "explorer mode: " << isExplorerMode << std::endl;
         }
 
-        show_particle_spawner_menu();
-        show_wall_spawner_menu(); 
-        show_batch_spawn_case_1();
-        show_batch_spawn_case_2();
-        show_batch_spawn_case_3(); 
-        show_reset_button();
+        if (!isExplorerMode) {
+            show_particle_spawner_menu();
+            show_batch_spawn_case_1();
+            show_batch_spawn_case_2();
+            show_batch_spawn_case_3();
+            show_reset_button();
+        }
 
         ImGui::End();
 

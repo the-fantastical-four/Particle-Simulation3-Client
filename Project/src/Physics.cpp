@@ -61,14 +61,7 @@ void update_particle_batch(std::vector<Particle>& particles, const std::vector<W
         sf::Vector2f offset = particle.velocity * delta;
         bool collide_wall = false;
 
-        for (const auto& wall : walls) {
-            sf::Vector2f temp = get_offset(particle, wall, delta);
-            if (temp != offset) {
-                offset = temp;
-                collide_wall = true;
-                break;
-            }
-        }
+        // removed wall calculations 
 
         particle.shape.move(offset);
         handle_collision(particle, sf::Vector2u(static_cast<unsigned int>(WIDTH), static_cast<unsigned int>(HEIGHT)), collide_wall, delta);
@@ -94,6 +87,8 @@ void update_particles(std::vector<Particle>& particles, const std::vector<Wall>&
         futures.push_back(std::move(future));
     }
 
+    // Move this to main thread so that updating sprite positions can be done 
+    // in parallel with this function 
     // Wait for all asynchronous tasks to complete
     for (auto& future : futures) {
         future.get();
