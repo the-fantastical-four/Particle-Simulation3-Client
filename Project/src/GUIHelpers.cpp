@@ -57,24 +57,6 @@ void show_particle_spawner_menu() {
     ImGui::NewLine();
 }
 
-void show_wall_spawner_menu() {
-    ImGui::Text("Spawn Wall");
-    ImGui::Columns(2, nullptr, false);
-    ImGui::InputFloat("x1", &wall_x1);
-    ImGui::NextColumn();
-    ImGui::InputFloat("y1", &wall_y1);
-    ImGui::NextColumn();
-    ImGui::InputFloat("x2", &wall_x2);
-    ImGui::NextColumn();
-    ImGui::InputFloat("y2", &wall_y2);
-    ImGui::Columns(1);
-    if (ImGui::Button("Spawn Wall")) {
-        walls.push_back(Wall(wall_x1, wall_y1, wall_x2, wall_y2));
-    }
-
-    ImGui::NewLine();
-}
-
 void show_batch_spawn_case_1() {
     //BATCH SPAWN CASE 1
         // Input Particle
@@ -205,6 +187,5 @@ void show_batch_spawn_case_3() {
 void show_reset_button() {
     if (ImGui::Button("Reset")) {
         particles.clear();
-        walls.clear();
     }
 }

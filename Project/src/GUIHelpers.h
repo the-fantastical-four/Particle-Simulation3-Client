@@ -6,7 +6,6 @@
 
 // External declarations for required variables
 extern std::vector<Particle> particles;
-extern std::vector<Wall> walls;
 extern float particle_x, particle_y, particle_angle, particle_speed;
 extern float wall_x1, wall_y1, wall_x2, wall_y2;
 extern int batch_size_a, batch_size_b, batch_size_c;

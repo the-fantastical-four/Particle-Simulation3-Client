@@ -27,7 +27,7 @@ void handle_collision(Particle& particle, const sf::Vector2u& window_size, bool 
 sf::Vector2f get_offset(Particle particle, Wall wall, float delta);
 
 
-void update_particle_batch(std::vector<Particle>& particles, const std::vector<Wall>& walls, size_t start, size_t end);
+void update_particle_batch(std::vector<Particle>& particles, size_t start, size_t end);
 
 
-std::vector<std::future<void>> update_particles(std::vector<Particle>& particles, const std::vector<Wall>& walls);
+std::vector<std::future<void>> update_particles(std::vector<Particle>& particles);

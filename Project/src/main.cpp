@@ -34,7 +34,6 @@ float batch_x_b = 0.f, batch_y_b = 0.f, batch_start_angle_b = 0.f, batch_end_ang
 float batch_x_c = 0.f, batch_y_c = 0.f, batch_angle_c = 0.f, batch_start_speed_c = 0.f, batch_end_speed_c = 0.f;
 
 std::vector<Particle> particles;
-std::vector<Wall> walls;
 
 void show_frame_rate(float fps) {
     ImGui::Begin("Frame Rate");
@@ -108,7 +107,7 @@ int main() {
         // -- END GUI STUFF --
 
         // update particles 
-        std::vector<std::future<void>> particle_futures = update_particles(particles, walls);
+        std::vector<std::future<void>> particle_futures = update_particles(particles);
 
         // Update sprite in another thread 
         std::future<void> sprite_future = spriteManager.updateAsync(window, isExplorerMode);
