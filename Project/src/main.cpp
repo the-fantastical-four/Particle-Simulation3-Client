@@ -133,12 +133,17 @@ int main() {
         // Draw sprite 
         spriteManager.draw(window, isExplorerMode);
 
+        sf::View currentView = window.getView();
+        sf::FloatRect viewBounds = sf::FloatRect(currentView.getCenter() - currentView.getSize() / 2.f, currentView.getSize());
+
         // Draw particles
         for (const auto& particle : particles) {
-            window.draw(particle.shape);
+
+            if (viewBounds.intersects(particle.shape.getGlobalBounds())) {
+                window.draw(particle.shape);
+            }
         }
 
-    
         // Display the contents of the window
         ImGui::SFML::Render(window);
         window.display();
