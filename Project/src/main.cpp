@@ -110,7 +110,9 @@ int main() {
         std::vector<std::future<void>> particle_futures = update_particles(particles, isExplorerMode);
 
         // Update sprite in another thread 
-        std::future<void> sprite_future = spriteManager.updateAsync(window, isExplorerMode);
+        std::future<void> sprite_future; 
+        if(isExplorerMode) // only launch async if in explorer mode 
+            sprite_future = spriteManager.updateAsync(window, isExplorerMode);
 
         // Clear the window
         window.clear();
@@ -125,7 +127,8 @@ int main() {
         }
 
         // wait for sprite position calculations
-        sprite_future.get();
+        if(isExplorerMode)
+            sprite_future.get();
 
         // restart clock, don't move this or else it affects the position of the particles 
         frame_clock.restart();
@@ -137,9 +140,17 @@ int main() {
         sf::FloatRect viewBounds = sf::FloatRect(currentView.getCenter() - currentView.getSize() / 2.f, currentView.getSize());
 
         // Draw particles
-        for (const auto& particle : particles) {
 
-            if (viewBounds.intersects(particle.shape.getGlobalBounds())) {
+        if (isExplorerMode) {
+            for (const auto& particle : particles) {
+
+                if (viewBounds.intersects(particle.shape.getGlobalBounds())) {
+                    window.draw(particle.shape);
+                }
+            }
+        }
+        else {
+            for (const auto& particle : particles) {
                 window.draw(particle.shape);
             }
         }
