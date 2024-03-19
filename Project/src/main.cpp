@@ -136,12 +136,13 @@ int main() {
         // Draw sprite 
         spriteManager.draw(window, isExplorerMode);
 
-        sf::View currentView = window.getView();
-        sf::FloatRect viewBounds = sf::FloatRect(currentView.getCenter() - currentView.getSize() / 2.f, currentView.getSize());
-
         // Draw particles
 
         if (isExplorerMode) {
+
+            sf::View currentView = window.getView();
+            sf::FloatRect viewBounds = sf::FloatRect(currentView.getCenter() - currentView.getSize() / 2.f, currentView.getSize());
+
             for (const auto& particle : particles) {
 
                 if (viewBounds.intersects(particle.shape.getGlobalBounds())) {
