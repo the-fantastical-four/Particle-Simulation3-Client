@@ -68,11 +68,12 @@ void update_particle_batch(std::vector<Particle>& particles, size_t start, size_
     }
 }
 
-std::vector<std::future<void>> update_particles(std::vector<Particle>& particles) {
+std::vector<std::future<void>> update_particles(std::vector<Particle>& particles, bool isExplorerMode) {
     const size_t num_particles = particles.size();
-    size_t num_threads = std::thread::hardware_concurrency();
+    size_t num_threads = (isExplorerMode) ? std::thread::hardware_concurrency() - 1 : 
+        std::thread::hardware_concurrency();
 
-    if (num_threads == 0) {
+    if (num_threads <= 0) {
         num_threads = 1;
     }
 
