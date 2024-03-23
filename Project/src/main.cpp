@@ -1,6 +1,7 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
 #include <vector>
 #include <cmath>
 #include <random>
