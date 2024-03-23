@@ -107,7 +107,7 @@ int main() {
         // -- END GUI STUFF --
 
         // update particles 
-        std::vector<std::future<void>> particle_futures = update_particles(particles, isExplorerMode);
+        std::vector<std::future<void>> particle_futures = update_particles(particles);
 
         // Update sprite in another thread 
         std::future<void> sprite_future; 
