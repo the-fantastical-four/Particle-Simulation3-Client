@@ -12,65 +12,57 @@ SpriteManager::SpriteManager(const std::string& texturePath, const sf::Vector2f&
     sprite.setPosition(initialPosition);
 }
 
-void SpriteManager::update(sf::RenderWindow& window, bool isExplorerMode) {
-    if (isExplorerMode) {
-        const float moveSpeed = 5.0f;
-        sf::Vector2f movement(0.f, 0.f);
+void SpriteManager::update(sf::RenderWindow& window) {
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) movement.y -= moveSpeed;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) movement.y += moveSpeed;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) movement.x -= moveSpeed;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) movement.x += moveSpeed;
+    const float moveSpeed = 5.0f;
+    sf::Vector2f movement(0.f, 0.f);
 
-        sf::Vector2f newPosition = sprite.getPosition() + movement;
-        sf::FloatRect spriteBounds = sprite.getGlobalBounds();
-        // changed to width and height to avoid particles and sprite going out of bounds in explorer mode
-        // when particles are spawned
-        float minX = 0, maxX = WIDTH - spriteBounds.width; 
-        float minY = 0, maxY = HEIGHT - spriteBounds.height;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) movement.y -= moveSpeed;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) movement.y += moveSpeed;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) movement.x -= moveSpeed;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) movement.x += moveSpeed;
 
-        newPosition.x = std::min(std::max(newPosition.x, minX), maxX);
-        newPosition.y = std::min(std::max(newPosition.y, minY), maxY);
+    sf::Vector2f newPosition = sprite.getPosition() + movement;
+    sf::FloatRect spriteBounds = sprite.getGlobalBounds();
+    // changed to width and height to avoid particles and sprite going out of bounds in explorer mode
+    // when particles are spawned
+    float minX = 0, maxX = WIDTH - spriteBounds.width;
+    float minY = 0, maxY = HEIGHT - spriteBounds.height;
 
-        sprite.setPosition(newPosition);
-    }
+    newPosition.x = std::min(std::max(newPosition.x, minX), maxX);
+    newPosition.y = std::min(std::max(newPosition.y, minY), maxY);
+
+    sprite.setPosition(newPosition);
 }
 
-std::future<void> SpriteManager::updateAsync(sf::RenderWindow& window, bool isExplorerMode) {
-    return std::async(std::launch::async, [this, &window, isExplorerMode]() {
-        update(window, isExplorerMode);
+std::future<void> SpriteManager::updateAsync(sf::RenderWindow& window) {
+    return std::async(std::launch::async, [this, &window]() {
+        update(window);
         });
 }
 
-void SpriteManager::draw(sf::RenderWindow& window, bool isExplorerMode) {
-    if (isExplorerMode) {
-        // Periphery dimensions in pixels
-        const float peripheryWidth = 33 * 10; // 33 columns, each 10 pixels wide
-        const float peripheryHeight = 19 * 10; // 19 rows, each 10 pixels tall
+void SpriteManager::draw(sf::RenderWindow& window) {
 
-        // Center the view on the sprite's current position
-        sf::Vector2f center(sprite.getPosition().x + sprite.getGlobalBounds().width / 2, sprite.getPosition().y + sprite.getGlobalBounds().height / 2);
-        sf::View view(center, sf::Vector2f(peripheryWidth, peripheryHeight));
+    // Periphery dimensions in pixels
+    const float peripheryWidth = 33 * 10; // 33 columns, each 10 pixels wide
+    const float peripheryHeight = 19 * 10; // 19 rows, each 10 pixels tall
 
-        
-        window.setView(view);
-        window.draw(sprite);
+    // Center the view on the sprite's current position
+    sf::Vector2f center(sprite.getPosition().x + sprite.getGlobalBounds().width / 2, sprite.getPosition().y + sprite.getGlobalBounds().height / 2);
+    sf::View view(center, sf::Vector2f(peripheryWidth, peripheryHeight));
 
-        //Draw the red border around sprite
-        sf::FloatRect spriteBounds = sprite.getGlobalBounds();
-        sf::RectangleShape border(sf::Vector2f(spriteBounds.width, spriteBounds.height)); // 10 is the extra size for the border, adjust as needed
 
-        border.setFillColor(sf::Color::Transparent); // Fill color is transparent, only the border will be visible
-        border.setOutlineColor(sf::Color::Red); // Red border color
-        border.setOutlineThickness(1); // Thickness of the border, adjust as needed
-        border.setPosition(sprite.getPosition().x, sprite.getPosition().y); // Adjust position to align with the sprite, considering the border thickness
+    window.setView(view);
+    window.draw(sprite);
 
-        window.draw(border);
-    } else {
-         // If not in explorer mode, reset to the default view
-         window.setView(window.getDefaultView());
-         window.draw(sprite);
+    //Draw the red border around sprite
+    sf::FloatRect spriteBounds = sprite.getGlobalBounds();
+    sf::RectangleShape border(sf::Vector2f(spriteBounds.width, spriteBounds.height)); // 10 is the extra size for the border, adjust as needed
 
-    }
-    
+    border.setFillColor(sf::Color::Transparent); // Fill color is transparent, only the border will be visible
+    border.setOutlineColor(sf::Color::Red); // Red border color
+    border.setOutlineThickness(1); // Thickness of the border, adjust as needed
+    border.setPosition(sprite.getPosition().x, sprite.getPosition().y); // Adjust position to align with the sprite, considering the border thickness
+
+    window.draw(border);
 }

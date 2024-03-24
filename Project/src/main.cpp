@@ -53,12 +53,26 @@ int main() {
     sf::Clock deltaClock;
 
     SpriteManager spriteManager("include/pikachu.png", sf::Vector2f(0.5f, 0.5f), sf::Vector2f(0, 0));
-    bool isExplorerMode = false;
 
     // Create background 
     sf::RectangleShape background;
     background.setSize(sf::Vector2f(WIDTH, HEIGHT));
     background.setFillColor(sf::Color::Cyan);
+
+    sf::TcpSocket socket;
+
+    if (socket.connect("127.0.0.1", 6250) != sf::Socket::Done) {
+        // Handle error
+    }
+
+    // To receive data
+    char buffer[1024];
+    std::size_t received;
+    if (socket.receive(buffer, sizeof(buffer), received) != sf::Socket::Done) {
+        // Handle error
+    }
+
+    std::cout << "server: " << buffer << std::endl; 
 
     // Game loop
     while (window.isOpen()) {
@@ -81,39 +95,11 @@ int main() {
 
         show_frame_rate(fps);
 
-        ImGui::Begin("Menu");
-
-        if (ImGui::Button("Explorer Mode")) {
-            isExplorerMode = true;
-            std::cout << "explorer mode: " << isExplorerMode << std::endl;
-        }
-
-        ImGui::SameLine();
-
-        if (ImGui::Button("Developer Mode")) {
-            isExplorerMode = false;
-            std::cout << "explorer mode: " << isExplorerMode << std::endl;
-        }
-
-        if (!isExplorerMode) {
-            show_particle_spawner_menu();
-            show_batch_spawn_case_1();
-            show_batch_spawn_case_2();
-            show_batch_spawn_case_3();
-            show_reset_button();
-        }
-
-        ImGui::End();
-
         // -- END GUI STUFF --
-
-        // update particles 
-        std::vector<std::future<void>> particle_futures = update_particles(particles);
 
         // Update sprite in another thread 
         std::future<void> sprite_future; 
-        if(isExplorerMode) // only launch async if in explorer mode 
-            sprite_future = spriteManager.updateAsync(window, isExplorerMode);
+        sprite_future = spriteManager.updateAsync(window);
 
         // Clear the window
         window.clear();
@@ -123,39 +109,20 @@ int main() {
 
         // wait for all threads to finish 
         // wait for all particle calculations 
-        for (auto& futures : particle_futures) {
-            futures.get(); 
-        }
 
         // wait for sprite position calculations
-        if(isExplorerMode)
-            sprite_future.get();
+        sprite_future.get();
 
         // restart clock, don't move this or else it affects the position of the particles 
         frame_clock.restart();
 
         // Draw sprite 
-        spriteManager.draw(window, isExplorerMode);
+        spriteManager.draw(window);
 
         // Draw particles
-
-        if (isExplorerMode) {
-
-            sf::View currentView = window.getView();
-            sf::FloatRect viewBounds = sf::FloatRect(currentView.getCenter() - currentView.getSize() / 2.f, currentView.getSize());
-
-            for (const auto& particle : particles) {
-
-                if (viewBounds.intersects(particle.shape.getGlobalBounds())) {
-                    window.draw(particle.shape);
-                }
-            }
-        }
-        else {
-            for (const auto& particle : particles) {
-                window.draw(particle.shape);
-            }
-        }
+        // for (const auto& particle : particles) {
+        //    window.draw(particle.shape);
+        // }
 
         // Display the contents of the window
         ImGui::SFML::Render(window);
