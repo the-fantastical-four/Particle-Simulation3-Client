@@ -14,6 +14,7 @@ public:
     void update(sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
     std::future<void> updateAsync(sf::RenderWindow& window);
+    sf::Vector2f getSpritePosition(); 
 
 private:
     sf::Texture texture;

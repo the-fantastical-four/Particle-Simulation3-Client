@@ -66,3 +66,7 @@ void SpriteManager::draw(sf::RenderWindow& window) {
 
     window.draw(border);
 }
+
+sf::Vector2f SpriteManager::getSpritePosition() {
+    return sprite.getPosition(); 
+}

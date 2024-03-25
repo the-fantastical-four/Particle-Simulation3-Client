@@ -13,6 +13,8 @@
 #include "Physics.h"
 #include "GUIhelpers.h"
 #include "SpriteManager.h" 
+#include "Connection.h"
+#include <filesystem>
 
 using namespace std;
 
@@ -59,20 +61,7 @@ int main() {
     background.setSize(sf::Vector2f(WIDTH, HEIGHT));
     background.setFillColor(sf::Color::Cyan);
 
-    sf::TcpSocket socket;
-
-    if (socket.connect("127.0.0.1", 6250) != sf::Socket::Done) {
-        // Handle error
-    }
-
-    // To receive data
-    char buffer[1024];
-    std::size_t received;
-    if (socket.receive(buffer, sizeof(buffer), received) != sf::Socket::Done) {
-        // Handle error
-    }
-
-    std::cout << "server: " << buffer << std::endl; 
+    connectToServer(); 
 
     // Game loop
     while (window.isOpen()) {
@@ -112,6 +101,7 @@ int main() {
 
         // wait for sprite position calculations
         sprite_future.get();
+        sendSpritePosition(spriteManager.getSpritePosition());
 
         // restart clock, don't move this or else it affects the position of the particles 
         frame_clock.restart();
