@@ -113,7 +113,7 @@ int main() {
         spriteManager.draw(window);
 
         for (auto& sprite : otherSprites) {
-            sprite->draw(window); 
+            sprite->drawOtherSprite(window); 
         }
 
         // Draw particles
