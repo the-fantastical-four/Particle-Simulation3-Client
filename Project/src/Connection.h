@@ -13,6 +13,30 @@ sf::TcpSocket serverSocket;
 
 extern SpriteManager sprite; 
 
+const sf::Vector2f scale = sf::Vector2f(0.5f, 0.5f); 
+const std::string spritePath = "include/pikachu.png";
+
+std::vector<SpriteManager*> receiveSprites() {
+    sf::Packet packet;
+    std::vector<sf::Vector2f> positions;
+
+    std::vector<SpriteManager*> otherSprites; 
+    if (serverSocket.receive(packet) == sf::Socket::Done) {
+        float x, y; 
+
+        while (packet >> x >> y) {
+            positions.emplace_back(x, y); 
+        }
+
+        for (auto position : positions) {
+            SpriteManager* spriteManager = new SpriteManager(spritePath, scale, position); 
+            otherSprites.push_back(spriteManager); 
+        }
+    }
+
+    return otherSprites; 
+}
+
 void sendSpritePosition(sf::Vector2f newPosition) {
     sf::Packet packet;
     packet << newPosition.x; 

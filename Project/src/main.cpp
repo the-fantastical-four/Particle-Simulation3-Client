@@ -71,6 +71,7 @@ int main() {
 
             if (event.type == sf::Event::Closed)
                 window.close();
+
         }
 
         ImGui::SFML::Update(window, deltaClock.restart());
@@ -101,13 +102,19 @@ int main() {
 
         // wait for sprite position calculations
         sprite_future.get();
-        sendSpritePosition(spriteManager.getSpritePosition());
+        sendSpritePosition(spriteManager.getSpritePosition()); 
+
+        std::vector<SpriteManager*> otherSprites = receiveSprites(); 
 
         // restart clock, don't move this or else it affects the position of the particles 
         frame_clock.restart();
 
         // Draw sprite 
         spriteManager.draw(window);
+
+        for (auto& sprite : otherSprites) {
+            sprite->draw(window); 
+        }
 
         // Draw particles
         // for (const auto& particle : particles) {
