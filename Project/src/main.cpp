@@ -36,7 +36,7 @@ float batch_start_x_a = 0.f, batch_start_y_a = 0.f, batch_end_x_a = 0.f, batch_e
 float batch_x_b = 0.f, batch_y_b = 0.f, batch_start_angle_b = 0.f, batch_end_angle_b = 0.f, batch_speed_b = 0.f;
 float batch_x_c = 0.f, batch_y_c = 0.f, batch_angle_c = 0.f, batch_start_speed_c = 0.f, batch_end_speed_c = 0.f;
 
-std::vector<Particle> particles;
+std::vector<Particle> particles; 
 
 void show_frame_rate(float fps) {
     ImGui::Begin("Frame Rate");
@@ -104,26 +104,31 @@ int main() {
         sprite_future.get();
         sendSpritePosition(spriteManager.getSpritePosition()); 
 
-        std::vector<SpriteManager*> otherSprites = receiveSprites(); 
+        std::vector<SpriteManager> otherSprites; 
 
         // restart clock, don't move this or else it affects the position of the particles 
         frame_clock.restart();
+
+        receiveSprites(std::ref(otherSprites), std::ref(particles)); 
 
         // Draw sprite 
         spriteManager.draw(window);
 
         for (auto& sprite : otherSprites) {
-            sprite->drawOtherSprite(window); 
+            sprite.drawOtherSprite(window); 
         }
 
         // Draw particles
-        // for (const auto& particle : particles) {
-        //    window.draw(particle.shape);
-        // }
+        for (const auto& particle : particles) {
+            window.draw(particle.shape);
+        }
 
         // Display the contents of the window
         ImGui::SFML::Render(window);
         window.display();
+
+        particles.clear(); 
+        otherSprites.clear(); 
 
         frame_count++; 
     }

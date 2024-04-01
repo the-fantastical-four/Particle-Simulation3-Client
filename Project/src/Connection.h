@@ -7,6 +7,9 @@
 #include <mutex>
 #include "SpriteManager.h"
 
+#define SPRITE 0 
+#define PARTICLE 1 
+
 sf::IpAddress serverIp = "127.0.0.1"; 
 unsigned short port = 6250; 
 sf::TcpSocket serverSocket; 
@@ -16,25 +19,24 @@ extern SpriteManager sprite;
 const sf::Vector2f scale = sf::Vector2f(0.5f, 0.5f); 
 const std::string spritePath = "include/pikachu.png";
 
-std::vector<SpriteManager*> receiveSprites() {
+void receiveSprites(std::vector<SpriteManager> &otherSprites, std::vector<Particle> &particles) {
     sf::Packet packet;
-    std::vector<sf::Vector2f> positions;
 
-    std::vector<SpriteManager*> otherSprites; 
     if (serverSocket.receive(packet) == sf::Socket::Done) {
+        sf::Uint8 messageType; 
         float x, y; 
 
-        while (packet >> x >> y) {
-            positions.emplace_back(x, y); 
+        while (packet >> messageType >> x >> y) {
+            sf::Vector2f position(x, y);
+            if (messageType == SPRITE) {
+                otherSprites.push_back(SpriteManager(spritePath, scale, position));
+            }
+            else {
+                particles.push_back(Particle(position));
+            }
         }
 
-        for (auto position : positions) {
-            SpriteManager* spriteManager = new SpriteManager(spritePath, scale, position); 
-            otherSprites.push_back(spriteManager); 
-        }
-    }
-
-    return otherSprites; 
+    } 
 }
 
 void sendSpritePosition(sf::Vector2f newPosition) {

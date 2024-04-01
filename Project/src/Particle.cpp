@@ -15,3 +15,9 @@ void Particle::set_angle_velocity(float angle_degrees) {
     velocity.x = speed * std::cos(angle_radians);
     velocity.y = speed * -std::sin(angle_radians);
 }
+
+Particle::Particle(sf::Vector2f position) {
+    shape.setSize(sf::Vector2f(SIZE, SIZE));
+    shape.setFillColor(sf::Color::White);
+    shape.setPosition(position); 
+}

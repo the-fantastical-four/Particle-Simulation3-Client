@@ -15,7 +15,6 @@ extern float batch_x_c, batch_y_c, batch_start_speed_c, batch_end_speed_c, batch
 
 void show_explorer_mode(sf::Sprite& sprite, sf::RenderWindow& window, bool isExplorerMode);
 void show_particle_spawner_menu();
-void show_wall_spawner_menu();
 void show_batch_spawn_case_1();
 void show_batch_spawn_case_2();
 void show_batch_spawn_case_3();
