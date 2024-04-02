@@ -15,13 +15,14 @@ unsigned short port = 6250;
 sf::TcpSocket serverSocket; 
 
 extern SpriteManager sprite; 
-extern std::vector<SpriteManager*> otherSprites;
 
 const sf::Vector2f scale = sf::Vector2f(0.5f, 0.5f); 
 const std::string spritePath = "include/pikachu.png";
 
-void receiveSprites(std::vector<Particle> &particles) {
+std::vector<SpriteManager*> receiveSprites(std::vector<Particle> &particles) {
     sf::Packet packet;
+
+    std::vector<SpriteManager*> otherSprites;
 
     if (serverSocket.receive(packet) == sf::Socket::Done) {
         sf::Uint8 messageType; 
@@ -39,6 +40,8 @@ void receiveSprites(std::vector<Particle> &particles) {
         }
 
     } 
+
+    return otherSprites;
 }
 
 void sendSpritePosition(sf::Vector2f newPosition) {
