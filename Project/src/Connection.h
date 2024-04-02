@@ -10,7 +10,7 @@
 #define SPRITE 0 
 #define PARTICLE 1 
 
-sf::IpAddress serverIp = "127.0.0.1"; 
+sf::IpAddress serverIp = "25.17.98.165"; 
 unsigned short port = 6250; 
 sf::TcpSocket serverSocket; 
 
@@ -27,6 +27,8 @@ std::vector<SpriteManager*> receiveSpritesAndParticles(std::vector<Particle> &pa
     if (serverSocket.receive(packet) == sf::Socket::Done) {
         sf::Uint8 messageType; 
         float x, y; 
+
+        particles.clear(); 
 
         while (packet >> messageType >> x >> y) {
             sf::Vector2f position(x, y);

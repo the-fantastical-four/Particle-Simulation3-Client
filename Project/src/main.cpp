@@ -131,8 +131,6 @@ int main() {
         ImGui::SFML::Render(window);
         window.display();
 
-        particles.clear(); 
-
         frame_count++; 
     }
 
