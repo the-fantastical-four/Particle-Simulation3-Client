@@ -121,16 +121,12 @@ int main() {
         spriteManager.draw(window);
 
         for (auto& sprite : otherSprites) {
-            if (isWithinPeriphery(sprite->getGlobalBounds(), spriteManager.getViewBounds())) {
-                sprite->drawOtherSprite(window);
-            }
+            sprite->drawOtherSprite(window);
         }
 
         // Draw particles
-        for (const auto& particle : particles) {
-            if (isWithinPeriphery(particle.shape.getGlobalBounds(), spriteManager.getViewBounds())) {
-                window.draw(particle.shape);
-            }
+        for (const auto& particle : particles) 
+            window.draw(particle.shape);
         }
 
         // Display the contents of the window
