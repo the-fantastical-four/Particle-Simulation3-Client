@@ -30,7 +30,8 @@ void receiveSprites(std::vector<Particle> &particles) {
         while (packet >> messageType >> x >> y) {
             sf::Vector2f position(x, y);
             if (messageType == SPRITE) {
-                otherSprites.push_back(new SpriteManager(spritePath, scale, position));
+                SpriteManager* sprite = new SpriteManager(spritePath, scale, position); 
+                otherSprites.push_back(sprite);
             }
             else {
                 particles.push_back(Particle(position));
