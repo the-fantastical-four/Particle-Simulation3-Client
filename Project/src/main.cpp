@@ -44,6 +44,14 @@ void show_frame_rate(float fps) {
     ImGui::End();
 }
 
+bool isWithinPeriphery(sf::FloatRect objectBounds, sf::FloatRect periphery) {
+    if (periphery.intersects(objectBounds)) {
+        return true;
+    }
+
+    return false;
+}
+
 int main() {
     sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Particle Bouncing");
     sf::View view = window.getDefaultView();
@@ -88,8 +96,7 @@ int main() {
         // -- END GUI STUFF --
 
         // Update sprite in another thread 
-        std::future<void> sprite_future; 
-        sprite_future = spriteManager.updateAsync(window);
+        spriteManager.update(window);
 
         // Clear the window
         window.clear();
@@ -101,7 +108,6 @@ int main() {
         // wait for all particle calculations 
 
         // wait for sprite position calculations
-        sprite_future.get();
         sendSpritePosition(spriteManager.getSpritePosition()); 
 
         std::vector<SpriteManager> otherSprites; 
@@ -115,12 +121,16 @@ int main() {
         spriteManager.draw(window);
 
         for (auto& sprite : otherSprites) {
-            sprite.drawOtherSprite(window); 
+            if (isWithinPeriphery(sprite.getGlobalBounds(), spriteManager.getViewBounds())) {
+                sprite.drawOtherSprite(window);
+            }
         }
 
         // Draw particles
         for (const auto& particle : particles) {
-            window.draw(particle.shape);
+            if (isWithinPeriphery(particle.shape.getGlobalBounds(), spriteManager.getViewBounds())) {
+                window.draw(particle.shape);
+            }
         }
 
         // Display the contents of the window

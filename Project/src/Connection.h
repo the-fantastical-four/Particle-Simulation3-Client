@@ -47,9 +47,6 @@ void sendSpritePosition(sf::Vector2f newPosition) {
     if (serverSocket.send(packet) != sf::Socket::Done) {
         std::cerr << "Failed to send packet to server" << std::endl;
     }
-    else {
-        std::cout << "Packet sent to server (" << newPosition.x << ", " << newPosition.y << ")" << std::endl;
-    }
 }
 
 void connectToServer() {
@@ -59,6 +56,6 @@ void connectToServer() {
     }
     else {
         std::cout << "Connected successfully to server" << std::endl;
-        serverSocket.setBlocking(false);
+        serverSocket.setBlocking(true);
     }
 }
