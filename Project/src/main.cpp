@@ -125,7 +125,7 @@ int main() {
         }
 
         // Draw particles
-        for (const auto& particle : particles) 
+        for (const auto& particle : particles) {
             window.draw(particle.shape);
         }
 
