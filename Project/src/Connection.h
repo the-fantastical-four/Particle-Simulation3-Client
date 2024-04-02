@@ -61,6 +61,6 @@ void connectToServer() {
     }
     else {
         std::cout << "Connected successfully to server" << std::endl;
-        serverSocket.setBlocking(true);
+        serverSocket.setBlocking(false);
     }
 }
