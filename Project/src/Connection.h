@@ -10,16 +10,17 @@
 #define SPRITE 0 
 #define PARTICLE 1 
 
-sf::IpAddress serverIp = "127.0.0.1"; 
+sf::IpAddress serverIp = "25.17.98.165"; 
 unsigned short port = 6250; 
 sf::TcpSocket serverSocket; 
 
 extern SpriteManager sprite; 
+extern std::vector<SpriteManager*> otherSprites;
 
 const sf::Vector2f scale = sf::Vector2f(0.5f, 0.5f); 
 const std::string spritePath = "include/pikachu.png";
 
-void receiveSprites(std::vector<SpriteManager> &otherSprites, std::vector<Particle> &particles) {
+void receiveSprites(std::vector<Particle> &particles) {
     sf::Packet packet;
 
     if (serverSocket.receive(packet) == sf::Socket::Done) {
@@ -29,7 +30,7 @@ void receiveSprites(std::vector<SpriteManager> &otherSprites, std::vector<Partic
         while (packet >> messageType >> x >> y) {
             sf::Vector2f position(x, y);
             if (messageType == SPRITE) {
-                otherSprites.push_back(SpriteManager(spritePath, scale, position));
+                otherSprites.push_back(new SpriteManager(spritePath, scale, position));
             }
             else {
                 particles.push_back(Particle(position));
