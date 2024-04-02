@@ -113,7 +113,7 @@ int main() {
         // restart clock, don't move this or else it affects the position of the particles 
         frame_clock.restart();
 
-        std::vector<SpriteManager*> otherSprites = receiveSprites(std::ref(particles));
+        std::vector<SpriteManager*> otherSprites = receiveSpritesAndParticles(std::ref(particles));
 
         // Draw sprite 
         spriteManager.draw(window);

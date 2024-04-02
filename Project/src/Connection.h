@@ -10,7 +10,7 @@
 #define SPRITE 0 
 #define PARTICLE 1 
 
-sf::IpAddress serverIp = "25.17.98.165"; 
+sf::IpAddress serverIp = "127.0.0.1"; 
 unsigned short port = 6250; 
 sf::TcpSocket serverSocket; 
 
@@ -19,7 +19,7 @@ extern SpriteManager sprite;
 const sf::Vector2f scale = sf::Vector2f(0.5f, 0.5f); 
 const std::string spritePath = "include/pikachu.png";
 
-std::vector<SpriteManager*> receiveSprites(std::vector<Particle> &particles) {
+std::vector<SpriteManager*> receiveSpritesAndParticles(std::vector<Particle> &particles) {
     sf::Packet packet;
 
     std::vector<SpriteManager*> otherSprites;
