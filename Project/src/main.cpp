@@ -132,7 +132,6 @@ int main() {
         window.display();
 
         particles.clear(); 
-        otherSprites.clear(); 
 
         frame_count++; 
     }
